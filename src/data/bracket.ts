@@ -1,6 +1,6 @@
 export interface BracketMatch {
   id: string;
-  round: 'R32' | 'R16' | 'QF' | 'SF' | 'F';
+  round: 'R32' | 'R16' | 'QF' | 'SF' | 'F' | '3RD';
   team1Slot: string;
   team2Slot: string;
   nextMatchId?: string;

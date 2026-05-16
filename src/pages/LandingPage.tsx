@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, LayoutGrid, Layers, Star, ArrowRight, Shield, Globe, Users } from 'lucide-react';
+import { Trophy, LayoutGrid, Layers, ArrowRight, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 

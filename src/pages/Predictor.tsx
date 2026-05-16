@@ -2,15 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Info, ArrowRight, RotateCcw, Trophy, Check, Star, Home } from 'lucide-react';
 import { tournamentData } from '../data/tournament';
-import type { Group, Team } from '../data/tournament';
+import type { Team } from '../data/tournament';
 import { knockoutStructure } from '../data/bracket';
 import type { BracketMatch } from '../data/bracket';
 import Modal from '../components/ui/Modal';
 import './Predictor.css';
 
-interface Prediction {
-  [groupId: string]: string[]; // Array of team IDs in order of rank
-}
 
 const Predictor: React.FC = () => {
   const renderHeader = () => (
@@ -95,11 +92,6 @@ const Predictor: React.FC = () => {
     });
   };
 
-  const getRank = (groupId: string, teamId: string) => {
-    const currentRanks = predictions[groupId] || [];
-    const index = currentRanks.indexOf(teamId);
-    return index !== -1 ? index + 1 : null;
-  };
 
   const handleStartOver = () => {
     setModalConfig({
@@ -245,7 +237,6 @@ const Predictor: React.FC = () => {
       return team ? { ...team, groupName: group.name } : null;
     }).filter(Boolean);
 
-    const progress = (thirdPlaceSelected.length / 8) * 100;
 
     return (
       <div className="third-place-view">
@@ -438,7 +429,7 @@ const Predictor: React.FC = () => {
     return predictions;
   };
 
-  const [knockoutRound, setKnockoutRound] = useState<'R32' | 'R16' | 'QF' | 'SF' | 'F'>('R32');
+  const [knockoutRound, setKnockoutRound] = useState<'R32' | 'R16' | 'QF' | 'SF' | 'F' | '3RD'>('R32');
 
   const knockoutRounds = [
     { key: 'R32' as const, label: 'Round of 32', matchCount: 16 },
