@@ -516,8 +516,10 @@ const Predictor: React.FC = () => {
           })}
         </div>
 
-        <div className={`knockout-matches-grid grid-${knockoutRound}`}>
-          {currentMatches.map(match => renderMatch(match))}
+        <div className="knockout-matches-grid-container">
+          <div className={`knockout-matches-grid grid-${knockoutRound}`}>
+            {currentMatches.map(match => renderMatch(match))}
+          </div>
         </div>
 
         {isRoundComplete('F') && (
