@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-blue: #0084B4;
+  --primary-blue-glow: rgba(0, 132, 180, 0.1);
+  --bg-main: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-hover: #F1F5F9;
+  --border-light: #E2E8F0;
+  --accent-gradient: linear-gradient(135deg, #0084B4 0%, #00C2FF 100%);
+  --text-main: #1E293B;
+  --text-muted: #64748B;
+  --font-family: 'Outfit', sans-serif;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+a {
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.bg-blob {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 132, 180, 0.05) 0%, transparent 70%);
+  filter: blur(80px);
+  z-index: -1;
+  border-radius: 50%;
+}
+
+.blob-1 { top: -200px; left: -200px; }
+.blob-2 { bottom: -200px; right: -200px; }
