@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+/* Inter font is imported in index.html */
 
 :root {
   --primary-blue: #0084B4;
@@ -10,7 +10,7 @@
   --accent-gradient: linear-gradient(135deg, #0084B4 0%, #00C2FF 100%);
   --text-main: #1E293B;
   --text-muted: #64748B;
-  --font-family: 'Outfit', sans-serif;
+  --font-family: 'Inter', sans-serif;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);

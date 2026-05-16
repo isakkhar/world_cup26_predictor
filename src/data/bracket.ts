@@ -14,7 +14,7 @@ export const knockoutStructure: BracketMatch[] = [
   { id: '73', round: 'R32', team1Slot: 'A1', team2Slot: 'T1', nextMatchId: '90', side: 'left' },
   { id: '75', round: 'R32', team1Slot: 'F1', team2Slot: 'C2', nextMatchId: '90', side: 'left' },
   { id: '83', round: 'R32', team1Slot: 'L2', team2Slot: 'T3', nextMatchId: '93', side: 'left' },
-  { id: '84', round: 'R32', team1Slot: 'H1', team2Slot: 'J3', nextMatchId: '93', side: 'left' },
+  { id: '84', round: 'R32', team1Slot: 'H1', team2Slot: 'T8', nextMatchId: '93', side: 'left' },
   { id: '81', round: 'R32', team1Slot: 'D1', team2Slot: 'J2', nextMatchId: '94', side: 'left' },
   { id: '82', round: 'R32', team1Slot: 'G1', team2Slot: 'T2', nextMatchId: '94', side: 'left' },
 
