@@ -5,7 +5,6 @@ import { toPng } from 'html-to-image';
 import { tournamentData } from '../data/tournament';
 import type { Team } from '../data/tournament';
 import { knockoutStructure } from '../data/bracket';
-import type { BracketMatch } from '../data/bracket';
 import Modal from '../components/ui/Modal';
 import './Predictor.css';
 
@@ -68,8 +67,6 @@ const Predictor: React.FC = () => {
     return saved ? JSON.parse(saved) : {};
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalConfig, setModalConfig] = useState({ title: '', message: '', type: '' });
 
   useEffect(() => {
     localStorage.setItem('wc2026_predictions', JSON.stringify(predictions));
