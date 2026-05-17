@@ -38,7 +38,10 @@ const GroupStage: React.FC = () => {
                     <img src={`https://flagcdn.com/w80/${team.flag.toLowerCase()}.png`} alt="" className="team-flag" />
                     <div className="flag-overlay"><Info size={14} /></div>
                   </div>
-                  <span className="team-name">{team.name}</span>
+                  <div className="team-name-group">
+                    <span className="team-name">{team.name}</span>
+                    <span className="team-fifa-rank">FIFA #{team.rank}</span>
+                  </div>
                   {rank > 0 ? <div className="rank-badge">{rank}</div> : <div className="rank-circle"></div>}
                 </div>
               );

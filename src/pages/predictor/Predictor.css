@@ -93,6 +93,23 @@
 .team-flag-wrapper:hover .flag-overlay { opacity: 1; }
 
 .team-name { flex: 1; font-weight: 700; font-size: 0.95rem; }
+.team-name-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.team-name-group .team-name {
+  flex: none;
+}
+.team-fifa-rank {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  opacity: 0.8;
+  margin-top: 0.1rem;
+}
 .rank-badge { width: 22px; height: 22px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; }
 .rank-circle { width: 22px; height: 22px; border: 1.5px solid var(--border); border-radius: 50%; }
 
@@ -119,11 +136,44 @@
 .round-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
 .knockout-matches-grid-container { display: flex; justify-content: center; }
-.knockout-matches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; width: 100%; max-width: 1200px; }
-.ko-match-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 1.5rem; }
+.knockout-matches-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; width: 100%; max-width: 1400px; }
+.ko-match-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; }
+.ko-match-details {
+  margin-top: 1.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+.detail-venue {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+}
+.detail-city {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+.detail-date {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #FFD700;
+  margin-top: 0.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+.theme-light .detail-date {
+  color: #b45309;
+}
 .ko-match-meta { font-size: 0.75rem; color: var(--text-dim); text-align: center; margin-bottom: 1.2rem; font-weight: 800; }
 .ko-team-box { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1.2rem; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 14px; cursor: pointer; margin-bottom: 0.5rem; }
 .ko-team-box.winner { border-color: var(--success); background: rgba(34, 197, 94, 0.1); }
+.team-info-main { display: flex; align-items: center; min-width: 0; flex: 1; }
 .ko-flag-icon { width: 24px; height: 16px; border-radius: 2px; margin-right: 0.8rem; }
 .ko-vs-divider { text-align: center; font-size: 0.7rem; font-weight: 900; color: var(--text-dim); margin: 0.5rem 0; }
 
@@ -137,9 +187,21 @@
 .spinning { animation: spin 1s linear infinite; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-@media (max-width: 1200px) { .groups-grid { grid-template-columns: repeat(3, 1fr); } .tp-list-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 900px) { .groups-grid { grid-template-columns: repeat(2, 1fr); } .tp-list-grid { grid-template-columns: 1fr; } }
-@media (max-width: 600px) { .groups-grid { grid-template-columns: 1fr; } .celebration-champion-name { font-size: 2.5rem; } }
+@media (max-width: 1200px) { 
+  .groups-grid { grid-template-columns: repeat(3, 1fr); } 
+  .tp-list-grid { grid-template-columns: repeat(2, 1fr); } 
+  .knockout-matches-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) { 
+  .groups-grid { grid-template-columns: repeat(2, 1fr); } 
+  .tp-list-grid { grid-template-columns: 1fr; } 
+  .knockout-matches-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) { 
+  .groups-grid { grid-template-columns: 1fr; } 
+  .knockout-matches-grid { grid-template-columns: 1fr; }
+  .celebration-champion-name { font-size: 2.5rem; } 
+}
 
 /* --- New Premium Features --- */
 .qualification-tracker { flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
