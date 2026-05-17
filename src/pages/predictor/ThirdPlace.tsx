@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Check, ArrowRight, Info } from 'lucide-react';
 import { tournamentData } from '../../data/tournament';
@@ -7,10 +7,16 @@ import { usePredictor } from '../../context/PredictorContext';
 import Modal from '../../components/ui/Modal';
 
 const ThirdPlace: React.FC = () => {
-  const { predictions, thirdPlaceSelected, toggleThirdPlaceTeam, getQualifiedTeamsList } = usePredictor();
+  const { predictions, thirdPlaceSelected, toggleThirdPlaceTeam, getQualifiedTeamsList, user } = usePredictor();
   const navigate = useNavigate();
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/predict/groups');
+    }
+  }, [user, navigate]);
 
   const showTeamStats = (team: Team) => {
     setSelectedTeam(team);

@@ -1,23 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Share2, ClipboardCheck, ArrowLeftRight } from 'lucide-react';
 import { usePredictor } from '../../context/PredictorContext';
 import { tournamentData } from '../../data/tournament';
-import { supabase } from '../../lib/supabase';
 import './Predictor.css';
 
 const PredictionRecap: React.FC = () => {
   const navigate = useNavigate();
   const { 
-    knockoutPredictions, getTeamBySlot, thirdPlaceSelected, predictions,
-    isSharedMode, sharedUsername, sharedScore, exitSharedMode
+    knockoutPredictions, getTeamBySlot, thirdPlaceSelected,
+    isSharedMode, sharedUsername, sharedScore, exitSharedMode,
+    user, savePredictionsToSupabase
   } = usePredictor();
 
-  const [username, setUsername] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedId, setSubmittedId] = useState<string | null>(() => localStorage.getItem('wc2026_submitted_id'));
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/predict/groups');
+    }
+  }, [user, navigate]);
 
   const championId = knockoutPredictions['104'];
 
@@ -123,37 +128,17 @@ const PredictionRecap: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!username.trim()) return;
+    if (!user) {
+      navigate('/predict/auth');
+      return;
+    }
     setSubmitting(true);
     setSubmitError(null);
 
     try {
-      // 1. Calculate a highly realistic dynamic prediction confidence score (e.g. 200-440 points)
-      const calculatedScore = 200 + Math.floor(Math.random() * 240);
-
-      // 2. Package complete prediction JSONSelections
-      const selections = {
-        predictions,
-        thirdPlaceSelected,
-        knockoutPredictions
-      };
-
-      // 3. Insert selections into Supabase predictions table
-      const { data, error } = await supabase
-        .from('predictions')
-        .insert([
-          { username: username.trim(), selections, score: calculatedScore }
-        ])
-        .select()
-        .single();
-
-      if (error || !data) {
-        throw new Error(error?.message || 'Failed to submit bracket predictions.');
-      }
-
-      // 4. Save submission ID in local storage to keep state persistent
-      localStorage.setItem('wc2026_submitted_id', data.id);
-      setSubmittedId(data.id);
+      const displayName = user.user_metadata?.username || user.email?.split('@')[0] || 'Predictor';
+      const newSubmittedId = await savePredictionsToSupabase(displayName);
+      setSubmittedId(newSubmittedId);
     } catch (err: unknown) {
       console.error('Error submitting predictions:', err);
       setSubmitError(err instanceof Error ? err.message : 'Failed to write data. Please check connection and try again.');
@@ -322,49 +307,52 @@ const PredictionRecap: React.FC = () => {
             Predict Your Own World Cup
           </button>
         </div>
-      ) : submittedId ? (
+      ) : user ? (
         <div className="share-section card-glowing-border">
           <div className="share-section-glow"></div>
-          <h3>🎉 Your Bracket is Saved & Live!</h3>
-          <p>Your picks have successfully synced to the global leaderboard database. Share this interactive link with your friends to let them browse your exact bracket!</p>
+          <h3>🎉 Your Bracket is Linked & Live!</h3>
+          <p>Your picks are securely saved to your account and synced with the global leaderboard. Share this interactive link to show off your exact selections!</p>
           
           <div className="share-input-group">
             <input 
               type="text" 
               readOnly 
-              value={`${window.location.origin}/predict/share?id=${submittedId}`} 
+              value={submittedId ? `${window.location.origin}/predict/share?id=${submittedId}` : 'Generating cloud link...'} 
               className="share-url-input"
             />
-            <button className="share-copy-btn" onClick={handleCopyLink}>
+            <button className="share-copy-btn" onClick={handleCopyLink} disabled={!submittedId}>
               {copied ? <ClipboardCheck size={18} /> : <Share2 size={18} />}
               {copied ? 'Copied! ✓' : 'Copy Share Link'}
             </button>
           </div>
+
+          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <button 
+              className="share-submit-btn" 
+              onClick={handleSubmit} 
+              disabled={submitting}
+              style={{ width: 'auto', padding: '0.8rem 1.5rem' }}
+            >
+              {submitting ? 'Syncing...' : '⚡ Force Cloud Sync'}
+            </button>
+          </div>
+          {submitError && <span className="submit-error" style={{ display: 'block', textAlign: 'center', marginTop: '0.5rem' }}>{submitError}</span>}
         </div>
       ) : (
         <div className="share-section card-glowing-border">
           <div className="share-section-glow"></div>
-          <h3>🌍 Save & Share Your Predictions</h3>
-          <p>Save your tournament picks to join the Global Leaderboard rankings and generate a unique interactive link to share with your friends!</p>
+          <h3>🌍 Save & Sync Your Predictions</h3>
+          <p>Sign in or create a free account to back up your selections securely, join the Global Leaderboard, and generate a unique interactive sharing link!</p>
           
-          <div className="submit-form-group">
-            <input 
-              type="text" 
-              placeholder="Enter username (e.g. MessiFan10)" 
-              value={username} 
-              onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9 ]/g, ''))}
-              maxLength={20}
-              className="username-input"
-            />
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
             <button 
               className="share-submit-btn" 
-              onClick={handleSubmit} 
-              disabled={submitting || !username.trim()}
+              onClick={() => navigate('/predict/auth')}
+              style={{ width: 'auto', padding: '1rem 2.5rem', fontSize: '1.05rem' }}
             >
-              {submitting ? 'Saving Bracket...' : 'Save Bracket & Share'}
+              Sign In to Save Bracket
             </button>
           </div>
-          {submitError && <span className="submit-error">{submitError}</span>}
         </div>
       )}
     </div>
