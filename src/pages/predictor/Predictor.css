@@ -678,4 +678,236 @@
   }
 }
 
+/* --- Prediction Recap Page --- */
+.recap-view-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 500px;
+  margin: 2rem auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+}
 
+.recap-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.recap-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.recap-card-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.recap-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recap-card-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.recap-card-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.recap-card-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.1rem;
+}
+
+.recap-flag {
+  width: 24px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+/* Specific Card Themes */
+.recap-card.champ {
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.05);
+}
+.recap-card.champ:hover {
+  border-color: rgba(245, 158, 11, 0.5);
+}
+.recap-card.champ .recap-card-icon {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
+}
+.recap-card.champ .recap-card-label {
+  color: rgba(245, 158, 11, 0.8);
+}
+
+.recap-card.runner {
+  background: rgba(148, 163, 184, 0.05);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+.recap-card.runner:hover {
+  border-color: rgba(148, 163, 184, 0.35);
+}
+.recap-card.runner .recap-card-icon {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.recap-card.runner .recap-card-label {
+  color: #94a3b8;
+}
+
+.recap-card.third {
+  background: rgba(180, 83, 9, 0.05);
+  border-color: rgba(180, 83, 9, 0.2);
+}
+.recap-card.third:hover {
+  border-color: rgba(180, 83, 9, 0.35);
+}
+.recap-card.third .recap-card-icon {
+  background: rgba(180, 83, 9, 0.1);
+  border: 1px solid rgba(180, 83, 9, 0.2);
+  color: #b45309;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.recap-card.third .recap-card-label {
+  color: #b45309;
+}
+
+.recap-card.fourth {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+.recap-card.fourth:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+}
+.recap-card.fourth .recap-card-icon {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.recap-card.fourth .recap-card-label {
+  color: #3b82f6;
+}
+
+/* Recap lists */
+.recap-lists-section {
+  width: 100%;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.recap-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.recap-list-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.recap-list-values {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+}
+
+/* Recap Empty State */
+.recap-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  max-width: 500px;
+  margin: 3rem auto;
+  gap: 1.5rem;
+}
+
+.recap-empty-icon {
+  font-size: 3rem;
+  animation: pulse 2s infinite;
+}
+
+.recap-empty-state h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.recap-empty-state p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.recap-empty-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--primary);
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.recap-empty-btn:hover {
+  background: var(--primary-glow);
+  transform: translateY(-2px);
+}

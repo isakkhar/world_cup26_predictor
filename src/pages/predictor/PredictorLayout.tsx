@@ -64,6 +64,7 @@ const PredictorLayout: React.FC = () => {
             <button className={`tab-button ${activeTab === 'groups' ? 'active' : ''}`} onClick={() => navigate('/predict/groups')}>Group Stage</button>
             <button className={`tab-button ${activeTab === 'third-place' ? 'active' : ''}`} onClick={() => navigate('/predict/third-place')}>Third Place</button>
             <button className={`tab-button ${activeTab === 'knockouts' ? 'active' : ''}`} onClick={() => navigate('/predict/knockouts')}>Knockouts</button>
+            <button className={`tab-button ${activeTab === 'recap' ? 'active' : ''}`} onClick={() => navigate('/predict/recap')}>Recap</button>
           </div>
           <div className="top-bar-actions">
             <button className="auto-simulate-btn" onClick={() => setIsSimModalOpen(true)}>⚡ AUTO SIMULATE</button>

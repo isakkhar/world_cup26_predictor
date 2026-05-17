@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { tournamentData } from '../data/tournament';
+import { tournamentData, getTeamColors } from '../data/tournament';
 import type { Team } from '../data/tournament';
 import { knockoutStructure } from '../data/bracket';
 
@@ -153,6 +153,21 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
     return null;
   };
+
+  useEffect(() => {
+    const champion = getTeamBySlot('W104');
+    if (champion) {
+      const colors = getTeamColors(champion.id);
+      document.documentElement.style.setProperty('--primary', colors.primary);
+      document.documentElement.style.setProperty('--primary-glow', colors.primaryGlow);
+      document.documentElement.style.setProperty('--accent', colors.accent);
+    } else {
+      document.documentElement.style.removeProperty('--primary');
+      document.documentElement.style.removeProperty('--primary-glow');
+      document.documentElement.style.removeProperty('--accent');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [knockoutPredictions, predictions, thirdPlaceSelected]);
 
   const getQualifiedTeamsList = () => {
     return thirdPlaceSelected.map(id => {
