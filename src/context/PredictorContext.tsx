@@ -211,7 +211,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     getInitialSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       const activeUser = session?.user || null;
       setUser(activeUser);
       setAuthLoading(false);

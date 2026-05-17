@@ -67,7 +67,7 @@ const Leaderboard: React.FC = () => {
         { id: 'legend-10', username: 'SocceroosFan', score: 210, champion: '🇦🇺 Australia', timeSince: '3d ago' },
       ];
 
-      const fetchedEntries: LeaderboardEntry[] = (data || []).map(item => ({
+      const fetchedEntries: LeaderboardEntry[] = (data || []).map((item: any) => ({
         id: item.id,
         username: item.username,
         score: item.score,
