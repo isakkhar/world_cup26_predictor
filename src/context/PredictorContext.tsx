@@ -177,18 +177,20 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Error signing out:', error);
-      throw error;
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Error contacting Supabase during sign out:', err);
+    } finally {
+      setUser(null);
+      localStorage.removeItem('wc2026_submitted_id');
+      localStorage.removeItem('wc2026_predictions');
+      localStorage.removeItem('wc2026_third_place');
+      localStorage.removeItem('wc2026_knockouts');
+      setPredictions({});
+      setThirdPlaceSelected([]);
+      setKnockoutPredictions({});
     }
-    localStorage.removeItem('wc2026_submitted_id');
-    localStorage.removeItem('wc2026_predictions');
-    localStorage.removeItem('wc2026_third_place');
-    localStorage.removeItem('wc2026_knockouts');
-    setPredictions({});
-    setThirdPlaceSelected([]);
-    setKnockoutPredictions({});
   };
 
   useEffect(() => {
