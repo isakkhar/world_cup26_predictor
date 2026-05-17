@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User as UserIcon, Loader2, ArrowLeft, ShieldCheck, AlertCircle, Inbox, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -70,17 +70,26 @@ const AuthPage: React.FC = () => {
           options: {
             data: {
               username: cleanedUsername
-            }
+            },
+            emailRedirectTo: `${window.location.origin}/`
           }
         });
 
         if (signUpError) throw signUpError;
 
         if (data?.user) {
-          setSuccess(true);
-          setTimeout(() => {
-            navigate('/predict/recap');
-          }, 1500);
+          if (!data.session) {
+            // Email confirmation is required
+            setSuccess(true);
+            setError('Account created! Please check your email to confirm your address before logging in.');
+            setLoading(false);
+            return;
+          } else {
+            setSuccess(true);
+            setTimeout(() => {
+              navigate('/predict/recap');
+            }, 1500);
+          }
         }
       } else {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -104,6 +113,19 @@ const AuthPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Clear ugly Supabase hash errors from the URL if present
+  useEffect(() => {
+    const sessionErr = sessionStorage.getItem('auth_error');
+    if (sessionErr) {
+      setError(sessionErr);
+      sessionStorage.removeItem('auth_error');
+    } else if (window.location.hash && window.location.hash.includes('error_code=otp_expired')) {
+      // Fallback in case App.tsx didn't catch it
+      setError('Your email link has expired or was already used. Please log in below.');
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
 
   return (
     <div className="auth-view-container">

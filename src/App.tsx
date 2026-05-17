@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import PredictorLayout from './pages/predictor/PredictorLayout';
@@ -15,6 +16,18 @@ import { PredictorProvider } from './context/PredictorContext';
 import './index.css';
 
 function App() {
+  // Global interceptor for Supabase auth errors (e.g., otp_expired from email links)
+  useEffect(() => {
+    if (window.location.hash && window.location.hash.includes('error_code=otp_expired')) {
+      sessionStorage.setItem('auth_error', 'Your email link has expired or was already used. Please log in.');
+      window.history.replaceState(null, '', window.location.pathname);
+      // Force redirect to auth page if they aren't already there
+      if (!window.location.pathname.includes('/predict/auth')) {
+        window.location.href = '/predict/auth';
+      }
+    }
+  }, []);
+
   return (
     <PredictorProvider>
       <Router>
