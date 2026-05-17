@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Trophy, Sun, Moon, Download, RotateCcw, User as UserIcon, LogOut } from 'lucide-react';
-import { toPng } from 'html-to-image';
+import { Home, Trophy, Sun, Moon, RotateCcw, User as UserIcon, LogOut } from 'lucide-react';
 import { usePredictor } from '../../context/PredictorContext';
 import Modal from '../../components/ui/Modal';
 import './Predictor.css';
@@ -14,35 +13,12 @@ const PredictorLayout: React.FC = () => {
   } = usePredictor();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isDownloading, setIsDownloading] = useState(false);
   const [isSimModalOpen, setIsSimModalOpen] = useState(false);
   const [isGateModalOpen, setIsGateModalOpen] = useState(false);
 
   const activeTab = location.pathname.split('/').pop() || 'groups';
 
-  const handleDownload = async () => {
-    const knockoutView = document.querySelector('.knockout-view');
-    if (!knockoutView) return;
-    
-    setIsDownloading(true);
-    setTimeout(async () => {
-      try {
-        const dataUrl = await toPng(knockoutView as HTMLElement, { 
-          cacheBust: true, 
-          pixelRatio: 2,
-          backgroundColor: theme === 'dark' ? '#020617' : '#ffffff',
-        });
-        const link = document.createElement('a');
-        link.download = `world-cup-2026-bracket.png`;
-        link.href = dataUrl;
-        link.click();
-      } catch (err) {
-        console.error('Download failed', err);
-      } finally {
-        setIsDownloading(false);
-      }
-    }, 500);
-  };
+
 
   const handleRestrictedTabClick = (path: string) => {
     if (!user) {
@@ -112,10 +88,6 @@ const PredictorLayout: React.FC = () => {
                 </button>
               )
             )}
-
-            <button className="download-btn" onClick={handleDownload} disabled={isDownloading || activeTab !== 'knockouts'}>
-              {isDownloading ? <RotateCcw className="spinning" size={20} /> : <Download size={20} />}
-            </button>
           </div>
         </header>
 
@@ -127,7 +99,6 @@ const PredictorLayout: React.FC = () => {
             <button className={`tab-button ${activeTab === 'recap' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/recap')}>Recap {!user && '🔒'}</button>
             <button className={`tab-button ${activeTab === 'trends' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/trends')}>Trends {!user && '🔒'}</button>
             <button className={`tab-button ${activeTab === 'leaderboard' ? 'active' : ''}`} onClick={() => navigate('/predict/leaderboard')}>Leaderboard</button>
-            {user && <button className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => navigate('/predict/profile')}>Profile</button>}
           </div>
           
           {!isSharedMode && (
