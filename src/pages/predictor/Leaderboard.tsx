@@ -51,28 +51,35 @@ const Leaderboard: React.FC = () => {
     if (isManualRefresh) setRefreshing(true);
     else setLoading(true);
 
+    const mockLegends: LeaderboardEntry[] = [
+      { id: 'legend-1', username: 'MbappeSpeedster', score: 440, champion: '🇫🇷 France', timeSince: '2h ago' },
+      { id: 'legend-2', username: 'SambaKing99', score: 415, champion: '🇧🇷 Brazil', timeSince: '4h ago' },
+      { id: 'legend-3', username: 'AlbicelesteFan', score: 390, champion: '🇦🇷 Argentina', timeSince: '6h ago' },
+      { id: 'legend-4', username: 'EuroTactician', score: 365, champion: '🇩🇪 Germany', timeSince: '8h ago' },
+      { id: 'legend-5', username: 'ThreeLionsBeliever', score: 320, champion: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', timeSince: '12h ago' },
+      { id: 'legend-6', username: 'RonaldoLegacy', score: 295, champion: '🇵🇹 Portugal', timeSince: '1d ago' },
+      { id: 'legend-7', username: 'FuriaRoja', score: 270, champion: '🇪🇸 Spain', timeSince: '1d ago' },
+      { id: 'legend-8', username: 'AzzurriHope', score: 245, champion: '🇮🇹 Italy', timeSince: '2d ago' },
+      { id: 'legend-9', username: 'OrangeArmy', score: 230, champion: '🇳🇱 Netherlands', timeSince: '2d ago' },
+      { id: 'legend-10', username: 'SocceroosFan', score: 210, champion: '🇦🇺 Australia', timeSince: '3d ago' },
+    ];
+
     try {
-      const { data, error } = await supabase
+      // 3-second network timeout wrapper to prevent page locking on Supabase pause/lag
+      const fetchPromise = supabase
         .from('predictions')
-        .select('id, username, score, created_at, selections')
+        .select('id, username, score, created_at')
         .order('score', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      const timeoutPromise = new Promise<{ data: null; error: Error }>((_, reject) =>
+        setTimeout(() => reject(new Error('Connection timeout')), 3000)
+      );
 
-      // Seed data for a populated feel
-      const mockLegends: LeaderboardEntry[] = [
-        { id: 'legend-1', username: 'MbappeSpeedster', score: 440, champion: '🇫🇷 France', timeSince: '2h ago' },
-        { id: 'legend-2', username: 'SambaKing99', score: 415, champion: '🇧🇷 Brazil', timeSince: '4h ago' },
-        { id: 'legend-3', username: 'AlbicelesteFan', score: 390, champion: '🇦🇷 Argentina', timeSince: '6h ago' },
-        { id: 'legend-4', username: 'EuroTactician', score: 365, champion: '🇩🇪 Germany', timeSince: '8h ago' },
-        { id: 'legend-5', username: 'ThreeLionsBeliever', score: 320, champion: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England', timeSince: '12h ago' },
-        { id: 'legend-6', username: 'RonaldoLegacy', score: 295, champion: '🇵🇹 Portugal', timeSince: '1d ago' },
-        { id: 'legend-7', username: 'FuriaRoja', score: 270, champion: '🇪🇸 Spain', timeSince: '1d ago' },
-        { id: 'legend-8', username: 'AzzurriHope', score: 245, champion: '🇮🇹 Italy', timeSince: '2d ago' },
-        { id: 'legend-9', username: 'OrangeArmy', score: 230, champion: '🇳🇱 Netherlands', timeSince: '2d ago' },
-        { id: 'legend-10', username: 'SocceroosFan', score: 210, champion: '🇦🇺 Australia', timeSince: '3d ago' },
-      ];
+      const response = await Promise.race([fetchPromise, timeoutPromise]) as { data: DBLeaderboardEntry[] | null; error: unknown };
+      const { data, error } = response;
+
+      if (error) throw error;
 
       const fetchedEntries: LeaderboardEntry[] = (data || []).map((item: DBLeaderboardEntry) => ({
         id: item.id,
@@ -84,21 +91,34 @@ const Leaderboard: React.FC = () => {
       }));
 
       if (submittedId && !fetchedEntries.some(e => e.id === submittedId)) {
-        const { data: userEntry } = await supabase
-          .from('predictions')
-          .select('id, username, score, created_at')
-          .eq('id', submittedId)
-          .single();
+        try {
+          const fetchUserPromise = supabase
+            .from('predictions')
+            .select('id, username, score, created_at')
+            .eq('id', submittedId)
+            .single();
 
-        if (userEntry) {
-          fetchedEntries.push({
-            id: userEntry.id,
-            username: userEntry.username,
-            score: userEntry.score,
-            created_at: userEntry.created_at,
-            timeSince: getTimeSince(userEntry.created_at),
-            isCurrentUser: true
-          });
+          const userResponse = await Promise.race([
+            fetchUserPromise,
+            new Promise<{ data: null; error: Error }>((_, reject) =>
+              setTimeout(() => reject(new Error('Timeout')), 2000)
+            )
+          ]) as { data: DBLeaderboardEntry | null; error: unknown };
+
+          const { data: userEntry } = userResponse;
+
+          if (userEntry) {
+            fetchedEntries.push({
+              id: userEntry.id,
+              username: userEntry.username,
+              score: userEntry.score,
+              created_at: userEntry.created_at,
+              timeSince: getTimeSince(userEntry.created_at),
+              isCurrentUser: true
+            });
+          }
+        } catch (e) {
+          console.warn('Failed to fetch user-specific leaderboard rank:', e);
         }
       }
 
@@ -109,7 +129,10 @@ const Leaderboard: React.FC = () => {
       setEntries(uniqueEntries);
       setTotalPredictors(1247 + fetchedEntries.length);
     } catch (err) {
-      console.error('Error loading leaderboard:', err);
+      console.warn('Error loading leaderboard from Supabase (falling back to mock list):', err);
+      // Clean fallback so that the page is never locked/blank
+      setEntries(mockLegends);
+      setTotalPredictors(1249);
     } finally {
       setLoading(false);
       setRefreshing(false);

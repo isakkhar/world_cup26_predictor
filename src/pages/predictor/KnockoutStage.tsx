@@ -169,15 +169,19 @@ const KnockoutStage: React.FC = () => {
 
   return (
     <div className="knockout-view">
-      <div className="premium-info-card knockout">
-        <Trophy size={20} className="info-icon-blue" />
+      <div className="premium-info-card rank-guide-card">
+        <div className="guide-icon-3d">
+          <Trophy size={24} color="#ffffff" strokeWidth={2.5} />
+        </div>
         <div className="info-text-content">
-          <span className="info-title">KNOCKOUT STAGE</span>
-          <p className="info-desc">Select match winners to advance. Complete all rounds to crown the champion.</p>
+          <span className="info-title-blue">KNOCKOUT STAGE</span>
+          <p className="info-desc-blue">
+            <strong>Select match winners:</strong> Tap teams to advance them. Complete all rounds to crown the champion.
+          </p>
         </div>
         <div className="qualification-tracker">
-          <span className="qualified-count">Progress: {Object.keys(knockoutPredictions).length} / 32</span>
-          <div className="mini-progress-bar"><div className="fill" style={{ width: `${(Object.keys(knockoutPredictions).length / 32) * 100}%` }} /></div>
+          <span className="qualified-count" style={{ color: '#0369a1', fontWeight: 800 }}>Progress: {Object.keys(knockoutPredictions).length} / 32</span>
+          <div className="mini-progress-bar" style={{ backgroundColor: 'rgba(2,132,199,0.15)' }}><div className="fill" style={{ width: `${(Object.keys(knockoutPredictions).length / 32) * 100}%`, backgroundColor: '#0284c7' }} /></div>
         </div>
       </div>
 

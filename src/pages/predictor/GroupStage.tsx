@@ -19,11 +19,15 @@ const GroupStage: React.FC = () => {
 
   return (
     <>
-      <div className="premium-info-card">
-        <Info size={20} className="info-icon-blue" />
+      <div className="premium-info-card rank-guide-card">
+        <div className="guide-icon-3d">
+          <Info size={24} color="#ffffff" strokeWidth={2.5} />
+        </div>
         <div className="info-text-content">
-          <span className="info-title">Tournament Analysis</span>
-          <p className="info-desc">Tap flags to view team stats. Rank teams 1st to 3rd in each group.</p>
+          <span className="info-title-blue">How to Rank Teams</span>
+          <p className="info-desc-blue">
+            <strong>Tap teams in order:</strong> 1st place &rarr; 2nd place &rarr; 3rd place. The 4th place team fills automatically.
+          </p>
         </div>
       </div>
       <div className="groups-grid">
