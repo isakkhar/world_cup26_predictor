@@ -5,6 +5,7 @@ import GroupStage from './pages/predictor/GroupStage';
 import ThirdPlace from './pages/predictor/ThirdPlace';
 import KnockoutStage from './pages/predictor/KnockoutStage';
 import PredictionRecap from './pages/predictor/PredictionRecap';
+import GlobalTrends from './pages/predictor/GlobalTrends';
 import { PredictorProvider } from './context/PredictorContext';
 import './index.css';
 
@@ -21,6 +22,7 @@ function App() {
               <Route path="third-place" element={<ThirdPlace />} />
               <Route path="knockouts" element={<KnockoutStage />} />
               <Route path="recap" element={<PredictionRecap />} />
+              <Route path="trends" element={<GlobalTrends />} />
             </Route>
           </Routes>
         </div>
