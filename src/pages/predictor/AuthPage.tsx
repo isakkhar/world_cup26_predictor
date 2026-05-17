@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User as UserIcon, Loader2, ArrowLeft, ShieldCheck, AlertCircle, Inbox, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -12,7 +12,20 @@ const AuthPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const sessionErr = sessionStorage.getItem('auth_error');
+      if (sessionErr) {
+        sessionStorage.removeItem('auth_error');
+        return sessionErr;
+      }
+      if (window.location.hash && window.location.hash.includes('error_code=otp_expired')) {
+        window.history.replaceState(null, '', window.location.pathname);
+        return 'Your email link has expired or was already used. Please log in below.';
+      }
+    }
+    return null;
+  });
   const [success, setSuccess] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
@@ -113,20 +126,6 @@ const AuthPage: React.FC = () => {
       setLoading(false);
     }
   };
-
-  // Clear ugly Supabase hash errors from the URL if present
-  useEffect(() => {
-    const sessionErr = sessionStorage.getItem('auth_error');
-    if (sessionErr) {
-      setError(sessionErr);
-      sessionStorage.removeItem('auth_error');
-    } else if (window.location.hash && window.location.hash.includes('error_code=otp_expired')) {
-      // Fallback in case App.tsx didn't catch it
-      setError('Your email link has expired or was already used. Please log in below.');
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-  }, []);
-
   return (
     <div className="auth-view-container">
       {/* Background Orb Visual Effects */}
