@@ -7,7 +7,10 @@ import Modal from '../../components/ui/Modal';
 import './Predictor.css';
 
 const PredictorLayout: React.FC = () => {
-  const { theme, toggleTheme, resetAll, simulateTournament } = usePredictor();
+  const { 
+    theme, toggleTheme, resetAll, simulateTournament,
+    isSharedMode, sharedUsername, sharedScore, exitSharedMode
+  } = usePredictor();
   const location = useLocation();
   const navigate = useNavigate();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -41,6 +44,17 @@ const PredictorLayout: React.FC = () => {
 
   return (
     <div className={`predictor-page-wrapper theme-${theme}`}>
+      {isSharedMode && (
+        <div className="shared-banner">
+          <div className="shared-banner-content">
+            <span className="shared-banner-text">
+              👀 You are interactively viewing <strong>{sharedUsername}</strong>'s prediction (Score: <strong>{sharedScore} pts</strong>)
+            </span>
+            <button className="exit-shared-btn" onClick={exitSharedMode}>Exit Shared View</button>
+          </div>
+        </div>
+      )}
+
       <div className="predictor-container">
         <header className="main-header">
           <div className="header-actions-left">
@@ -66,11 +80,15 @@ const PredictorLayout: React.FC = () => {
             <button className={`tab-button ${activeTab === 'knockouts' ? 'active' : ''}`} onClick={() => navigate('/predict/knockouts')}>Knockouts</button>
             <button className={`tab-button ${activeTab === 'recap' ? 'active' : ''}`} onClick={() => navigate('/predict/recap')}>Recap</button>
             <button className={`tab-button ${activeTab === 'trends' ? 'active' : ''}`} onClick={() => navigate('/predict/trends')}>Trends</button>
+            <button className={`tab-button ${activeTab === 'leaderboard' ? 'active' : ''}`} onClick={() => navigate('/predict/leaderboard')}>Leaderboard</button>
           </div>
-          <div className="top-bar-actions">
-            <button className="auto-simulate-btn" onClick={() => setIsSimModalOpen(true)}>⚡ AUTO SIMULATE</button>
-            <button className="start-over-top" onClick={() => { if(confirm('Are you sure you want to reset all predictions?')) resetAll(); }}><RotateCcw size={16} /> START OVER</button>
-          </div>
+          
+          {!isSharedMode && (
+            <div className="top-bar-actions">
+              <button className="auto-simulate-btn" onClick={() => setIsSimModalOpen(true)}>⚡ AUTO SIMULATE</button>
+              <button className="start-over-top" onClick={() => { if(confirm('Are you sure you want to reset all predictions?')) resetAll(); }}><RotateCcw size={16} /> START OVER</button>
+            </div>
+          )}
         </div>
 
         <Outlet />

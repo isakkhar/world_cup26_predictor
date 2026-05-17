@@ -18,6 +18,11 @@ interface PredictorContextType {
   getQualifiedTeamsList: () => (Team | null)[];
   resetAll: () => void;
   simulateTournament: (style: 'safe' | 'chaos') => void;
+  isSharedMode: boolean;
+  sharedUsername: string | null;
+  sharedScore: number;
+  enterSharedMode: (username: string, selections: any, score: number) => void;
+  exitSharedMode: () => void;
 }
 
 const PredictorContext = createContext<PredictorContextType | undefined>(undefined);
@@ -42,28 +47,77 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : {};
   });
 
+  const [isSharedMode, setIsSharedMode] = useState(false);
+  const [sharedUsername, setSharedUsername] = useState<string | null>(null);
+  const [sharedScore, setSharedScore] = useState(0);
+  const [localBackup, setLocalBackup] = useState<{
+    predictions: Record<string, string[]>;
+    thirdPlace: string[];
+    knockouts: Record<string, string>;
+  } | null>(null);
+
   useEffect(() => {
     document.body.className = `theme-${theme}`;
     localStorage.setItem('wc2026_theme', theme);
   }, [theme]);
 
   useEffect(() => {
+    if (isSharedMode) return;
     localStorage.setItem('wc2026_predictions', JSON.stringify(predictions));
-  }, [predictions]);
+  }, [predictions, isSharedMode]);
 
   useEffect(() => {
+    if (isSharedMode) return;
     localStorage.setItem('wc2026_third_place', JSON.stringify(thirdPlaceSelected));
-  }, [thirdPlaceSelected]);
+  }, [thirdPlaceSelected, isSharedMode]);
 
   useEffect(() => {
+    if (isSharedMode) return;
     localStorage.setItem('wc2026_knockouts', JSON.stringify(knockoutPredictions));
-  }, [knockoutPredictions]);
+  }, [knockoutPredictions, isSharedMode]);
+
+  const enterSharedMode = (
+    username: string,
+    selections: {
+      predictions: Record<string, string[]>;
+      thirdPlaceSelected: string[];
+      knockoutPredictions: Record<string, string>;
+    },
+    score: number
+  ) => {
+    if (!isSharedMode) {
+      setLocalBackup({
+        predictions,
+        thirdPlace: thirdPlaceSelected,
+        knockouts: knockoutPredictions
+      });
+    }
+    setIsSharedMode(true);
+    setSharedUsername(username);
+    setSharedScore(score);
+    setPredictions(selections.predictions || {});
+    setThirdPlaceSelected(selections.thirdPlaceSelected || []);
+    setKnockoutPredictions(selections.knockoutPredictions || {});
+  };
+
+  const exitSharedMode = () => {
+    if (localBackup) {
+      setPredictions(localBackup.predictions);
+      setThirdPlaceSelected(localBackup.thirdPlace);
+      setKnockoutPredictions(localBackup.knockouts);
+      setLocalBackup(null);
+    }
+    setIsSharedMode(false);
+    setSharedUsername(null);
+    setSharedScore(0);
+  };
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   const handleRankTeam = (groupId: string, teamId: string) => {
+    if (isSharedMode) return;
     setPredictions(prev => {
       const currentRanks = prev[groupId] || [];
       if (currentRanks.includes(teamId)) {
@@ -82,6 +136,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const toggleThirdPlaceTeam = (teamId: string) => {
+    if (isSharedMode) return;
     setThirdPlaceSelected(prev => {
       if (prev.includes(teamId)) return prev.filter(id => id !== teamId);
       if (prev.length < 8) return [...prev, teamId];
@@ -91,6 +146,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const handleKnockoutWinner = (matchId: string, teamId: string) => {
+    if (isSharedMode) return;
     setKnockoutPredictions(prev => {
       const currentWinner = prev[matchId];
       const newPredictions = { ...prev };
@@ -287,7 +343,9 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       thirdPlaceSelected, toggleThirdPlaceTeam,
       knockoutPredictions, handleKnockoutWinner,
       getTeamBySlot, getQualifiedTeamsList, resetAll,
-      simulateTournament
+      simulateTournament,
+      isSharedMode, sharedUsername, sharedScore,
+      enterSharedMode, exitSharedMode
     }}>
       {children}
     </PredictorContext.Provider>
