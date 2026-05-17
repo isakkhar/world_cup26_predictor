@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { tournamentData } from '../data/tournament';
@@ -16,6 +17,7 @@ interface PredictorContextType {
   getTeamBySlot: (slot: string) => Team | null;
   getQualifiedTeamsList: () => (Team | null)[];
   resetAll: () => void;
+  simulateTournament: (style: 'safe' | 'chaos') => void;
 }
 
 const PredictorContext = createContext<PredictorContextType | undefined>(undefined);
@@ -162,6 +164,103 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     }).filter(Boolean);
   };
 
+  const simulateTournament = (style: 'safe' | 'chaos') => {
+    const newPredictions: Record<string, string[]> = {};
+    const thirdPlaceTeams: Team[] = [];
+
+    tournamentData.forEach(group => {
+      let sortedTeams = [...group.teams];
+      if (style === 'safe') {
+        sortedTeams.sort((a, b) => a.rank - b.rank);
+      } else {
+        const scoredTeams = sortedTeams.map(t => ({
+          team: t,
+          score: t.rank * (0.6 + Math.random() * 0.8)
+        }));
+        scoredTeams.sort((a, b) => a.score - b.score);
+        sortedTeams = scoredTeams.map(st => st.team);
+      }
+      newPredictions[group.id] = sortedTeams.map(t => t.id);
+      thirdPlaceTeams.push(sortedTeams[2]);
+    });
+
+    const selectedThirdPlace = style === 'safe'
+      ? [...thirdPlaceTeams].sort((a, b) => a.rank - b.rank).slice(0, 8)
+      : (() => {
+          const scoredThird = thirdPlaceTeams.map(t => ({
+            team: t,
+            score: t.rank * (0.6 + Math.random() * 0.8)
+          }));
+          scoredThird.sort((a, b) => a.score - b.score);
+          return scoredThird.slice(0, 8).map(st => st.team);
+        })();
+
+    const newThirdPlaceSelected = selectedThirdPlace.map(t => t.id);
+    const newKnockoutPredictions: Record<string, string> = {};
+
+    const getLocalTeamBySlot = (slot: string, localKnockout: Record<string, string>): Team | null => {
+      if (/^[A-L][1-3]$/.test(slot)) {
+        const groupId = slot[0];
+        const rank = parseInt(slot[1]) - 1;
+        const teamId = (newPredictions[groupId] || [])[rank];
+        if (!teamId) return null;
+        for (const g of tournamentData) {
+          const team = g.teams.find(t => t.id === teamId);
+          if (team) return team;
+        }
+      }
+      if (/^L\d+$/.test(slot)) {
+        const matchId = slot.substring(1);
+        const match = knockoutStructure.find(m => m.id === matchId);
+        if (!match) return null;
+        const winnerId = localKnockout[matchId];
+        if (!winnerId) return null;
+        const t1 = getLocalTeamBySlot(match.team1Slot, localKnockout);
+        const t2 = getLocalTeamBySlot(match.team2Slot, localKnockout);
+        if (!t1 || !t2) return null;
+        return winnerId === t1.id ? t2 : t1;
+      }
+      if (/^T[1-8]$/.test(slot)) {
+        const index = parseInt(slot.substring(1)) - 1;
+        const teamId = newThirdPlaceSelected[index];
+        if (!teamId) return null;
+        for (const g of tournamentData) {
+          const team = g.teams.find(t => t.id === teamId);
+          if (team) return team;
+        }
+      }
+      if (/^W\d+$/.test(slot)) {
+        const matchId = slot.substring(1);
+        const winnerId = localKnockout[matchId];
+        if (!winnerId) return null;
+        for (const g of tournamentData) {
+          const team = g.teams.find(t => t.id === winnerId);
+          if (team) return team;
+        }
+      }
+      return null;
+    };
+
+    knockoutStructure.forEach(match => {
+      const t1 = getLocalTeamBySlot(match.team1Slot, newKnockoutPredictions);
+      const t2 = getLocalTeamBySlot(match.team2Slot, newKnockoutPredictions);
+      if (t1 && t2) {
+        let winner: Team;
+        if (style === 'safe') {
+          winner = t1.rank < t2.rank ? t1 : t2;
+        } else {
+          const probT1 = t2.rank / (t1.rank + t2.rank);
+          winner = Math.random() < probT1 ? t1 : t2;
+        }
+        newKnockoutPredictions[match.id] = winner.id;
+      }
+    });
+
+    setPredictions(newPredictions);
+    setThirdPlaceSelected(newThirdPlaceSelected);
+    setKnockoutPredictions(newKnockoutPredictions);
+  };
+
   const resetAll = () => {
     localStorage.clear();
     window.location.reload();
@@ -172,7 +271,8 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       theme, toggleTheme, predictions, handleRankTeam,
       thirdPlaceSelected, toggleThirdPlaceTeam,
       knockoutPredictions, handleKnockoutWinner,
-      getTeamBySlot, getQualifiedTeamsList, resetAll
+      getTeamBySlot, getQualifiedTeamsList, resetAll,
+      simulateTournament
     }}>
       {children}
     </PredictorContext.Provider>

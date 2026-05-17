@@ -8,9 +8,10 @@
   backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 1rem;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: 2rem 1rem;
 }
 
 .modal-content {
@@ -23,6 +24,14 @@
   text-align: center;
   color: var(--text);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  margin: auto;
+  position: relative;
+}
+
+/* Make comparison and simulation modals wider */
+.modal-content:has(.comparison-modal-refined),
+.modal-content:has(.simulation-modal-content) {
+  max-width: 650px;
 }
 
 .theme-light .modal-content {
@@ -76,3 +85,31 @@
 
 .modal-btn-confirm:hover { opacity: 0.9; transform: translateY(-2px); }
 .modal-btn-cancel:hover { background: rgba(255, 255, 255, 0.1); }
+
+.modal-close-x {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+  z-index: 10;
+}
+
+.modal-close-x:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  transform: rotate(90deg);
+}
+
+.theme-light .modal-close-x:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}

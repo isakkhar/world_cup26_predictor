@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import './Modal.css';
 
 interface ModalProps {
@@ -34,6 +35,9 @@ const Modal: React.FC<ModalProps> = ({
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             onClick={(e) => e.stopPropagation()}
           >
+            <button className="modal-close-x" onClick={onClose} aria-label="Close modal">
+              <X size={20} />
+            </button>
             <h2>{title}</h2>
             {message && <p>{message}</p>}
             {children}
