@@ -18,13 +18,32 @@ const PredictionRecap: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedId, setSubmittedId] = useState<string | null>(() => localStorage.getItem('wc2026_submitted_id'));
 
+  const championId = knockoutPredictions['104'];
+
   useEffect(() => {
     if (!user) {
       navigate('/predict/groups');
     }
   }, [user, navigate]);
 
-  const championId = knockoutPredictions['104'];
+  // Auto-sync predictions to Supabase when arriving at the recap page
+  useEffect(() => {
+    if (user && championId && !isSharedMode) {
+      const autoSync = async () => {
+        try {
+          const displayName = user.user_metadata?.username || user.email?.split('@')[0] || 'Predictor';
+          const newId = await savePredictionsToSupabase(displayName);
+          if (newId) {
+            setSubmittedId(newId);
+            localStorage.setItem('wc2026_submitted_id', newId);
+          }
+        } catch (err) {
+          console.error('Auto-sync failed:', err);
+        }
+      };
+      autoSync();
+    }
+  }, [user, championId, isSharedMode, savePredictionsToSupabase]);
 
   const getTeamById = (teamId: string) => {
     for (const group of tournamentData) {

@@ -142,6 +142,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       if (error) throw error;
 
       if (data) {
+        localStorage.setItem('wc2026_submitted_id', data.id);
         if (data.selections) {
           setPredictions(data.selections.predictions || {});
           setThirdPlaceSelected(data.selections.thirdPlaceSelected || []);
