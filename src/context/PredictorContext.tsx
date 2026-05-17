@@ -5,7 +5,7 @@ import { tournamentData, getTeamColors } from '../data/tournament';
 import type { Team } from '../data/tournament';
 import { knockoutStructure } from '../data/bracket';
 import { supabase } from '../lib/supabase';
-import type { User } from '@supabase/supabase-js';
+import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 interface PredictorContextType {
   theme: 'dark' | 'light';
@@ -211,7 +211,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     getInitialSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       const activeUser = session?.user || null;
       setUser(activeUser);
       setAuthLoading(false);

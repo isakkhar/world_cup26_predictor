@@ -15,6 +15,13 @@ interface LeaderboardEntry {
   timeSince?: string;
 }
 
+interface DBLeaderboardEntry {
+  id: string;
+  username: string;
+  score: number;
+  created_at: string;
+}
+
 // Pure helper function declared outside component to prevent render impurity flags
 const getTimeSince = (dateStr?: string): string => {
   if (!dateStr) return '';
@@ -67,7 +74,7 @@ const Leaderboard: React.FC = () => {
         { id: 'legend-10', username: 'SocceroosFan', score: 210, champion: '🇦🇺 Australia', timeSince: '3d ago' },
       ];
 
-      const fetchedEntries: LeaderboardEntry[] = (data || []).map((item: any) => ({
+      const fetchedEntries: LeaderboardEntry[] = (data || []).map((item: DBLeaderboardEntry) => ({
         id: item.id,
         username: item.username,
         score: item.score,
