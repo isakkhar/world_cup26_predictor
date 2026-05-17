@@ -33,22 +33,41 @@ const PredictorContext = createContext<PredictorContextType | undefined>(undefin
 
 export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    return (localStorage.getItem('wc2026_theme') as 'dark' | 'light') || 'dark';
+    try {
+      return (localStorage.getItem('wc2026_theme') as 'dark' | 'light') || 'dark';
+    } catch {
+      return 'dark';
+    }
   });
 
   const [predictions, setPredictions] = useState<Record<string, string[]>>(() => {
-    const saved = localStorage.getItem('wc2026_predictions');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('wc2026_predictions');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      console.error('Error parsing predictions local storage:', e);
+      return {};
+    }
   });
 
   const [thirdPlaceSelected, setThirdPlaceSelected] = useState<string[]>(() => {
-    const saved = localStorage.getItem('wc2026_third_place');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('wc2026_third_place');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error('Error parsing third place local storage:', e);
+      return [];
+    }
   });
 
   const [knockoutPredictions, setKnockoutPredictions] = useState<Record<string, string>>(() => {
-    const saved = localStorage.getItem('wc2026_knockouts');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('wc2026_knockouts');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      console.error('Error parsing knockouts local storage:', e);
+      return {};
+    }
   });
 
   const [isSharedMode, setIsSharedMode] = useState(false);
