@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, Check, ArrowRight, Info } from 'lucide-react';
+import { Check, ArrowRight, Info } from 'lucide-react';
 import { tournamentData } from '../../data/tournament';
 import type { Team } from '../../data/tournament';
 import { usePredictor } from '../../context/PredictorContext';
