@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Key, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Key, Loader2, ShieldCheck, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import './Predictor.css';
 
 const ResetPasswordPage: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -91,7 +93,7 @@ const ResetPasswordPage: React.FC = () => {
               <div className="input-with-icon">
                 <Key className="input-icon" size={16} />
                 <input 
-                  type="password" 
+                  type={showPassword1 ? "text" : "password"} 
                   placeholder="At least 6 characters" 
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -99,6 +101,14 @@ const ResetPasswordPage: React.FC = () => {
                   minLength={6}
                   required
                 />
+                <button 
+                  type="button" 
+                  className="password-toggle-visibility-btn"
+                  onClick={() => setShowPassword1(!showPassword1)}
+                  title={showPassword1 ? "Hide password" : "Show password"}
+                >
+                  {showPassword1 ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
@@ -107,7 +117,7 @@ const ResetPasswordPage: React.FC = () => {
               <div className="input-with-icon">
                 <Key className="input-icon" size={16} />
                 <input 
-                  type="password" 
+                  type={showPassword2 ? "text" : "password"} 
                   placeholder="Repeat new password" 
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -115,6 +125,14 @@ const ResetPasswordPage: React.FC = () => {
                   minLength={6}
                   required
                 />
+                <button 
+                  type="button" 
+                  className="password-toggle-visibility-btn"
+                  onClick={() => setShowPassword2(!showPassword2)}
+                  title={showPassword2 ? "Hide password" : "Show password"}
+                >
+                  {showPassword2 ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
