@@ -27,16 +27,20 @@ const ThirdPlace: React.FC = () => {
 
   return (
     <div className="third-place-view">
-      <div className="premium-info-card gold">
-        <Star size={20} className="info-icon-gold" />
+      <div className="premium-info-card rank-guide-card">
+        <div className="guide-icon-3d">
+          <Info size={24} color="#ffffff" strokeWidth={2.5} />
+        </div>
         <div className="info-text-content">
-          <span className="info-title">BEST THIRD-PLACE TEAMS</span>
-          <p className="info-desc">Select exactly 8 teams to advance to the knockout bracket.</p>
+          <span className="info-title-blue">BEST THIRD-PLACE TEAMS</span>
+          <p className="info-desc-blue">
+            <strong>Select 8 teams:</strong> Tap teams below to advance them to the knockout bracket.
+          </p>
         </div>
         <div className="qualification-tracker">
-          <span className="qualified-count">{thirdPlaceSelected.length} / 8</span>
+          <span className="qualified-count" style={{ color: '#0369a1', fontWeight: 800 }}>{thirdPlaceSelected.length} / 8</span>
           <div className="mini-progress-dots">
-            {[...Array(8)].map((_, i) => <div key={i} className={`dot ${i < thirdPlaceSelected.length ? 'active' : ''}`} />)}
+            {[...Array(8)].map((_, i) => <div key={i} className={`dot ${i < thirdPlaceSelected.length ? 'active' : ''}`} style={{ backgroundColor: i < thirdPlaceSelected.length ? '#0284c7' : 'rgba(2,132,199,0.2)' }} />)}
           </div>
         </div>
       </div>
