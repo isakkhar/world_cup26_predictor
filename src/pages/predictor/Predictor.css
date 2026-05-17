@@ -2110,7 +2110,7 @@
 .silver-medal { color: #cbd5e1; }
 .bronze-medal { color: #d97706; }
 
-.rank-badge {
+.podium-avatar .rank-badge {
   position: absolute;
   bottom: -5px;
   right: -5px;
@@ -2126,9 +2126,9 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-.rank-badge.gold { background: #fbbf24; border: 2px solid #78350f; }
-.rank-badge.silver { background: #cbd5e1; border: 2px solid #334155; }
-.rank-badge.bronze { background: #d97706; border: 2px solid #7c2d12; }
+.podium-avatar .rank-badge.gold { background: #fbbf24; border: 2px solid #78350f; }
+.podium-avatar .rank-badge.silver { background: #cbd5e1; border: 2px solid #334155; }
+.podium-avatar .rank-badge.bronze { background: #d97706; border: 2px solid #7c2d12; }
 
 .podium-name {
   font-size: 1rem;

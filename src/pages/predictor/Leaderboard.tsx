@@ -110,8 +110,10 @@ const Leaderboard: React.FC = () => {
   }, [submittedId]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchLeaderboard();
+    const timer = setTimeout(() => {
+      fetchLeaderboard();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [fetchLeaderboard]);
 
   // Animate the total count on load
