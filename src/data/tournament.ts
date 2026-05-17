@@ -153,3 +153,64 @@ export const tournamentData: Group[] = [
     ],
   },
 ];
+
+export interface TeamColors {
+  primary: string;
+  primaryGlow: string;
+  accent: string;
+}
+
+export const getTeamColors = (teamId: string): TeamColors => {
+  const colorMap: Record<string, TeamColors> = {
+    // Group A
+    mex: { primary: '#006847', primaryGlow: 'rgba(0, 104, 71, 0.4)', accent: '#c8102e' },
+    rsa: { primary: '#007a3d', primaryGlow: 'rgba(0, 122, 61, 0.4)', accent: '#f4b400' },
+    kor: { primary: '#cd2e3a', primaryGlow: 'rgba(205, 46, 58, 0.4)', accent: '#0047a0' },
+    cze: { primary: '#11457e', primaryGlow: 'rgba(17, 69, 126, 0.4)', accent: '#d7141a' },
+    // Group B
+    can: { primary: '#ff0000', primaryGlow: 'rgba(255, 0, 0, 0.4)', accent: '#ffffff' },
+    sui: { primary: '#d52b1e', primaryGlow: 'rgba(213, 43, 30, 0.4)', accent: '#ffffff' },
+    qat: { primary: '#8a1538', primaryGlow: 'rgba(138, 21, 56, 0.4)', accent: '#ffffff' },
+    bih: { primary: '#002f6c', primaryGlow: 'rgba(0, 47, 108, 0.4)', accent: '#ffd700' },
+    // Group C
+    bra: { primary: '#15803d', primaryGlow: 'rgba(21, 128, 61, 0.4)', accent: '#eab308' },
+    mar: { primary: '#c1272d', primaryGlow: 'rgba(193, 39, 45, 0.4)', accent: '#006233' },
+    hai: { primary: '#00209f', primaryGlow: 'rgba(0, 32, 159, 0.4)', accent: '#d21034' },
+    'gb-sct': { primary: '#0065bf', primaryGlow: 'rgba(0, 101, 191, 0.4)', accent: '#ffffff' },
+    // Group D
+    usa: { primary: '#002868', primaryGlow: 'rgba(0, 40, 104, 0.4)', accent: '#bf0a30' },
+    par: { primary: '#d52b1e', primaryGlow: 'rgba(213, 43, 30, 0.4)', accent: '#0038a8' },
+    aus: { primary: '#002f6c', primaryGlow: 'rgba(0, 47, 108, 0.4)', accent: '#ffd700' },
+    tur: { primary: '#e30a17', primaryGlow: 'rgba(227, 10, 23, 0.4)', accent: '#ffffff' },
+    // Group E
+    ger: { primary: '#000000', primaryGlow: 'rgba(0, 0, 0, 0.5)', accent: '#ffd700' },
+    cw: { primary: '#002b7f', primaryGlow: 'rgba(0, 43, 127, 0.4)', accent: '#f9e814' },
+    ci: { primary: '#ff8200', primaryGlow: 'rgba(255, 130, 0, 0.4)', accent: '#009a44' },
+    ec: { primary: '#ffd700', primaryGlow: 'rgba(255, 215, 0, 0.4)', accent: '#001489' },
+    // Group F
+    ned: { primary: '#ff4f00', primaryGlow: 'rgba(255, 79, 0, 0.4)', accent: '#21468b' },
+    jpn: { primary: '#bc002d', primaryGlow: 'rgba(188, 0, 45, 0.4)', accent: '#002f6c' },
+    tn: { primary: '#e20f18', primaryGlow: 'rgba(226, 15, 24, 0.4)', accent: '#ffffff' },
+    se: { primary: '#006aa7', primaryGlow: 'rgba(0, 106, 167, 0.4)', accent: '#fecc00' },
+    // Group G
+    bel: { primary: '#e30613', primaryGlow: 'rgba(227, 6, 19, 0.4)', accent: '#ffd700' },
+    eg: { primary: '#c09300', primaryGlow: 'rgba(192, 147, 0, 0.4)', accent: '#c1272d' },
+    // Custom common giants/favorites fallback list
+    arg: { primary: '#75aadb', primaryGlow: 'rgba(117, 170, 219, 0.4)', accent: '#fcbf49' },
+    fra: { primary: '#002395', primaryGlow: 'rgba(0, 35, 149, 0.4)', accent: '#ed2939' },
+    eng: { primary: '#ce1124', primaryGlow: 'rgba(206, 17, 36, 0.4)', accent: '#0b2c56' },
+    esp: { primary: '#c60b1e', primaryGlow: 'rgba(198, 11, 30, 0.4)', accent: '#ffc400' },
+    por: { primary: '#006600', primaryGlow: 'rgba(0, 102, 0, 0.4)', accent: '#ff0000' },
+    ita: { primary: '#008c45', primaryGlow: 'rgba(0, 140, 69, 0.4)', accent: '#cd212a' },
+    uru: { primary: '#56b4e8', primaryGlow: 'rgba(86, 180, 232, 0.4)', accent: '#f9d01b' },
+    cro: { primary: '#ff0000', primaryGlow: 'rgba(255, 0, 0, 0.4)', accent: '#002f6c' },
+    sen: { primary: '#00853f', primaryGlow: 'rgba(0, 133, 63, 0.4)', accent: '#fdef42' },
+  };
+
+  return colorMap[teamId] || {
+    primary: '#004585',
+    primaryGlow: 'rgba(0, 69, 133, 0.4)',
+    accent: '#FFD700',
+  };
+};
+

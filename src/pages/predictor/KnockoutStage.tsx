@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trophy, Check, BarChart2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import confetti from 'canvas-confetti';
 import { knockoutStructure } from '../../data/bracket';
 import { usePredictor } from '../../context/PredictorContext';
 import type { Team } from '../../data/tournament';
@@ -92,7 +94,18 @@ const getSeededH2H = (team1Code: string, team2Code: string, rank1: number, rank2
   return { played, wins1, wins2, draws, form1, form2, probT1, probT2 };
 };
 
+const playStadiumCheer = () => {
+  try {
+    const audio = new Audio('/stadium_cheer.mp3');
+    audio.volume = 0.6;
+    audio.play().catch(e => console.log('Audio autoplay blocked by browser', e));
+  } catch (err) {
+    console.error('Failed to play local stadium cheer', err);
+  }
+};
+
 const KnockoutStage: React.FC = () => {
+  const navigate = useNavigate();
   const { knockoutPredictions, handleKnockoutWinner, getTeamBySlot } = usePredictor();
   const [knockoutRound, setKnockoutRound] = useState<'R32' | 'R16' | 'QF' | 'SF' | 'F' | '3RD'>('R32');
   const [comparisonTeams, setComparisonTeams] = useState<{ t1: Team; t2: Team } | null>(null);
@@ -102,6 +115,38 @@ const KnockoutStage: React.FC = () => {
     setComparisonTeams({ t1, t2 });
     setIsComparisonOpen(true);
   };
+
+  const championId = knockoutPredictions['104'];
+
+  useEffect(() => {
+    if (championId) {
+      playStadiumCheer();
+      
+      const duration = 4 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+      const randomInRange = (min: number, max: number) => {
+        return Math.random() * (max - min) + min;
+      };
+
+      const interval = window.setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+      }, 250);
+
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [championId]);
 
   const knockoutRounds = [
     { key: 'R32' as const, label: 'Round of 32', matchCount: 16 },
@@ -189,10 +234,16 @@ const KnockoutStage: React.FC = () => {
       </div>
 
       {knockoutPredictions['104'] && (
-        <div className="celebration-view">
-          <Trophy size={80} color="#FFD700" />
+        <div 
+          className="celebration-view cursor-pointer hover:scale-105 active:scale-95 transition-all duration-300 flex flex-col items-center justify-center p-6 border border-amber-500/20 bg-amber-500/5 rounded-3xl"
+          onClick={() => navigate('/predict/recap')}
+          style={{ cursor: 'pointer' }}
+          title="Click to view prediction recap"
+        >
+          <Trophy size={80} color="#FFD700" className="animate-pulse" />
           <div className="celebration-champion-name">{getTeamBySlot('W104')?.name}</div>
           <div className="celebration-subtitle">2026 WORLD CUP CHAMPION</div>
+          <span className="text-[10px] text-slate-500 font-medium tracking-wider mt-2 opacity-65 hover:opacity-100 transition-opacity">🏆 Click to View Prediction Recap</span>
         </div>
       )}
 
