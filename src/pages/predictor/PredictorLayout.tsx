@@ -3,13 +3,15 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Trophy, Sun, Moon, Download, RotateCcw } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { usePredictor } from '../../context/PredictorContext';
+import Modal from '../../components/ui/Modal';
 import './Predictor.css';
 
 const PredictorLayout: React.FC = () => {
-  const { theme, toggleTheme, resetAll } = usePredictor();
+  const { theme, toggleTheme, resetAll, simulateTournament } = usePredictor();
   const location = useLocation();
   const navigate = useNavigate();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSimModalOpen, setIsSimModalOpen] = useState(false);
 
   const activeTab = location.pathname.split('/').pop() || 'groups';
 
@@ -63,11 +65,41 @@ const PredictorLayout: React.FC = () => {
             <button className={`tab-button ${activeTab === 'third-place' ? 'active' : ''}`} onClick={() => navigate('/predict/third-place')}>Third Place</button>
             <button className={`tab-button ${activeTab === 'knockouts' ? 'active' : ''}`} onClick={() => navigate('/predict/knockouts')}>Knockouts</button>
           </div>
-          <button className="start-over-top" onClick={() => { if(confirm('Are you sure you want to reset all predictions?')) resetAll(); }}><RotateCcw size={16} /> START OVER</button>
+          <div className="top-bar-actions">
+            <button className="auto-simulate-btn" onClick={() => setIsSimModalOpen(true)}>⚡ AUTO SIMULATE</button>
+            <button className="start-over-top" onClick={() => { if(confirm('Are you sure you want to reset all predictions?')) resetAll(); }}><RotateCcw size={16} /> START OVER</button>
+          </div>
         </div>
 
         <Outlet />
       </div>
+
+      <Modal 
+        isOpen={isSimModalOpen} 
+        onClose={() => setIsSimModalOpen(false)} 
+        title="⚡ Auto-Simulate Tournament" 
+        hideCancel={true} 
+        confirmText="Cancel"
+        onConfirm={() => setIsSimModalOpen(false)}
+      >
+        <div className="simulation-modal-content">
+          <p className="sim-intro">
+            Choose your tournament simulation style. Running a simulation will overwrite your current predictions.
+          </p>
+          <div className="sim-options-grid">
+            <div className="sim-option-card" onClick={() => { simulateTournament('safe'); setIsSimModalOpen(false); }}>
+              <div className="sim-option-icon">🛡️</div>
+              <h3>Safe Mode</h3>
+              <p>Strictly follows FIFA World Rankings. Strongest teams qualify and win matches.</p>
+            </div>
+            <div className="sim-option-card chaos" onClick={() => { simulateTournament('chaos'); setIsSimModalOpen(false); }}>
+              <div className="sim-option-icon">⚡</div>
+              <h3>Chaos Mode</h3>
+              <p>Calculates relative win probabilities. Includes dramatic upsets and unexpected champions!</p>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
