@@ -9,6 +9,8 @@ import GlobalTrends from './pages/predictor/GlobalTrends';
 import Leaderboard from './pages/predictor/Leaderboard';
 import SharedBracketViewer from './pages/predictor/SharedBracketViewer';
 import AuthPage from './pages/predictor/AuthPage';
+import ProfilePage from './pages/predictor/ProfilePage';
+import ResetPasswordPage from './pages/predictor/ResetPasswordPage';
 import { PredictorProvider } from './context/PredictorContext';
 import './index.css';
 
@@ -29,6 +31,8 @@ function App() {
               <Route path="leaderboard" element={<Leaderboard />} />
               <Route path="share" element={<SharedBracketViewer />} />
               <Route path="auth" element={<AuthPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="reset-password" element={<ResetPasswordPage />} />
             </Route>
           </Routes>
         </div>

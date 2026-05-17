@@ -16,6 +16,7 @@ const PredictorLayout: React.FC = () => {
   const navigate = useNavigate();
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSimModalOpen, setIsSimModalOpen] = useState(false);
+  const [isGateModalOpen, setIsGateModalOpen] = useState(false);
 
   const activeTab = location.pathname.split('/').pop() || 'groups';
 
@@ -41,6 +42,14 @@ const PredictorLayout: React.FC = () => {
         setIsDownloading(false);
       }
     }, 500);
+  };
+
+  const handleRestrictedTabClick = (path: string) => {
+    if (!user) {
+      setIsGateModalOpen(true);
+    } else {
+      navigate(path);
+    }
   };
 
   return (
@@ -72,15 +81,19 @@ const PredictorLayout: React.FC = () => {
             {!authLoading && (
               user ? (
                 <>
-                  <div className="header-user-badge" title={user.email || ''}>
+                  <button 
+                    className={`auth-header-btn profile ${activeTab === 'profile' ? 'active' : ''}`} 
+                    onClick={() => navigate('/predict/profile')}
+                    title="View Dashboard"
+                  >
                     <UserIcon size={14} />
                     <span>{user.user_metadata?.username || user.email?.split('@')[0]}</span>
-                  </div>
+                  </button>
                   <button 
                     className="auth-header-btn logout" 
                     onClick={() => {
                       if (confirm('Are you sure you want to log out and clear active session?')) {
-                        signOut();
+                        signOut().then(() => navigate('/predict/groups'));
                       }
                     }}
                     title="Log Out"
@@ -109,16 +122,25 @@ const PredictorLayout: React.FC = () => {
         <div className="predictor-top-bar">
           <div className="nav-tabs">
             <button className={`tab-button ${activeTab === 'groups' ? 'active' : ''}`} onClick={() => navigate('/predict/groups')}>Group Stage</button>
-            <button className={`tab-button ${activeTab === 'third-place' ? 'active' : ''}`} onClick={() => navigate('/predict/third-place')}>Third Place</button>
-            <button className={`tab-button ${activeTab === 'knockouts' ? 'active' : ''}`} onClick={() => navigate('/predict/knockouts')}>Knockouts</button>
-            <button className={`tab-button ${activeTab === 'recap' ? 'active' : ''}`} onClick={() => navigate('/predict/recap')}>Recap</button>
-            <button className={`tab-button ${activeTab === 'trends' ? 'active' : ''}`} onClick={() => navigate('/predict/trends')}>Trends</button>
+            <button className={`tab-button ${activeTab === 'third-place' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/third-place')}>Third Place {!user && '🔒'}</button>
+            <button className={`tab-button ${activeTab === 'knockouts' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/knockouts')}>Knockouts {!user && '🔒'}</button>
+            <button className={`tab-button ${activeTab === 'recap' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/recap')}>Recap {!user && '🔒'}</button>
+            <button className={`tab-button ${activeTab === 'trends' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/trends')}>Trends {!user && '🔒'}</button>
             <button className={`tab-button ${activeTab === 'leaderboard' ? 'active' : ''}`} onClick={() => navigate('/predict/leaderboard')}>Leaderboard</button>
+            {user && <button className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => navigate('/predict/profile')}>Profile</button>}
           </div>
           
           {!isSharedMode && (
             <div className="top-bar-actions">
-              <button className="auto-simulate-btn" onClick={() => setIsSimModalOpen(true)}>⚡ AUTO SIMULATE</button>
+              <button 
+                className="auto-simulate-btn" 
+                onClick={() => {
+                  if (!user) setIsGateModalOpen(true);
+                  else setIsSimModalOpen(true);
+                }}
+              >
+                ⚡ AUTO SIMULATE
+              </button>
               <button className="start-over-top" onClick={() => { if(confirm('Are you sure you want to reset all predictions?')) resetAll(); }}><RotateCcw size={16} /> START OVER</button>
             </div>
           )}
@@ -127,6 +149,7 @@ const PredictorLayout: React.FC = () => {
         <Outlet />
       </div>
 
+      {/* Auto-Simulate Modal */}
       <Modal 
         isOpen={isSimModalOpen} 
         onClose={() => setIsSimModalOpen(false)} 
@@ -150,6 +173,42 @@ const PredictorLayout: React.FC = () => {
               <h3>Chaos Mode</h3>
               <p>Calculates relative win probabilities. Includes dramatic upsets and unexpected champions!</p>
             </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 🔐 Registration Gate Lock Modal */}
+      <Modal 
+        isOpen={isGateModalOpen} 
+        onClose={() => setIsGateModalOpen(false)} 
+        title="🔐 Unlock 2026 World Cup Simulator" 
+        hideCancel={true} 
+        confirmText="Keep Editing Group Stage"
+        onConfirm={() => setIsGateModalOpen(false)}
+      >
+        <div className="gate-modal-content">
+          <div className="gate-lock-icon">🔒</div>
+          <h3>Create a Free Account to Advance!</h3>
+          <p className="gate-intro">
+            You are doing great! Sign up or log in in seconds to unlock full simulator features, compete in rankings, and save your live bracket:
+          </p>
+          <ul className="gate-benefits-list">
+            <li>⚡ <strong>Auto-Simulate:</strong> Skip picking and simulate the entire tournament instantly.</li>
+            <li>🥉 <strong>Third-Placed Rankings:</strong> Pick the best 8 of 12 group stage third-place teams.</li>
+            <li>🌳 <strong>Knockout Bracket:</strong> Predict matches from the Round of 32 all the way to the World Cup Final!</li>
+            <li>🌍 <strong>Leaderboard & Sharing:</strong> Sync picks, earn ranking points, and share your interactive picks URL!</li>
+          </ul>
+          
+          <div className="gate-modal-buttons">
+            <button 
+              className="gate-submit-btn" 
+              onClick={() => {
+                setIsGateModalOpen(false);
+                navigate('/predict/auth');
+              }}
+            >
+              Sign In / Register Now
+            </button>
           </div>
         </div>
       </Modal>

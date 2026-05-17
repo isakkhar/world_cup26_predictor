@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User as UserIcon, Loader2, ArrowLeft, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, Loader2, ArrowLeft, ShieldCheck, AlertCircle, Inbox } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import './Predictor.css';
 
 const AuthPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
+  const [activeTab, setActiveTab] = useState<'signin' | 'signup' | 'forgot'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -13,6 +13,7 @@ const AuthPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const navigate = useNavigate();
 
@@ -21,6 +22,31 @@ const AuthPage: React.FC = () => {
     setLoading(true);
     setError(null);
     setSuccess(false);
+    setResetSent(false);
+
+    if (activeTab === 'forgot') {
+      if (!email.trim()) {
+        setError('Please enter your account email.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: `${window.location.origin}/predict/reset-password`
+        });
+
+        if (resetError) throw resetError;
+
+        setResetSent(true);
+      } catch (err: unknown) {
+        console.error('Password reset email error:', err);
+        setError(err instanceof Error ? err.message : 'Failed to send recovery email. Please check address and try again.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     if (!email.trim() || !password.trim()) {
       setError('Please fill in all required fields.');
@@ -95,34 +121,67 @@ const AuthPage: React.FC = () => {
         <div className="auth-card-glow"></div>
         
         <div className="auth-card-header">
-          <h2>🏆 2026 World Cup Predictor</h2>
-          <p>Sign up or log in to sync your bracket and join the global leaderboard</p>
+          {activeTab === 'forgot' ? (
+            <>
+              <h2>🔒 Recover Password</h2>
+              <p>Enter your verified email address to receive a secure recovery credentials link</p>
+            </>
+          ) : (
+            <>
+              <h2>🏆 2026 World Cup Predictor</h2>
+              <p>Sign up or log in to sync your bracket and join the global leaderboard</p>
+            </>
+          )}
         </div>
 
-        {/* Tab Selector */}
-        <div className="auth-tabs">
+        {/* Segment Tabs */}
+        {activeTab === 'forgot' ? (
           <button 
             type="button" 
-            className={`auth-tab-btn ${activeTab === 'signin' ? 'active' : ''}`}
+            className="auth-back-to-login" 
             onClick={() => { setActiveTab('signin'); setError(null); }}
           >
-            Sign In
+            ← Return to Log In
           </button>
-          <button 
-            type="button" 
-            className={`auth-tab-btn ${activeTab === 'signup' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('signup'); setError(null); }}
-          >
-            Create Account
-          </button>
-        </div>
+        ) : (
+          <div className="auth-tabs">
+            <button 
+              type="button" 
+              className={`auth-tab-btn ${activeTab === 'signin' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('signin'); setError(null); }}
+            >
+              Sign In
+            </button>
+            <button 
+              type="button" 
+              className={`auth-tab-btn ${activeTab === 'signup' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('signup'); setError(null); }}
+            >
+              Create Account
+            </button>
+          </div>
+        )}
 
-        {/* Auth Forms */}
+        {/* Success View */}
         {success ? (
           <div className="auth-success-view">
             <ShieldCheck className="auth-success-icon animate-bounce" size={48} />
             <h3>Success!</h3>
             <p>{activeTab === 'signup' ? 'Your account was created securely.' : 'Welcome back!'} Redirecting you...</p>
+          </div>
+        ) : resetSent ? (
+          <div className="auth-success-view">
+            <Inbox className="auth-success-icon animate-pulse" size={48} style={{ color: '#3b82f6' }} />
+            <h3>Recovery Email Dispatched!</h3>
+            <p>We've sent a password reset link to <strong>{email}</strong>. Check your inbox and spam folders to continue.</p>
+            <button 
+              type="button" 
+              className="auth-submit-btn" 
+              style={{ marginTop: '1.5rem' }}
+              onClick={() => { setActiveTab('signin'); setEmail(''); setResetSent(false); }}
+            >
+              Back to Login Screen
+            </button>
           </div>
         ) : (
           <form className="auth-form" onSubmit={handleAuthSubmit}>
@@ -166,21 +225,34 @@ const AuthPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="auth-input-group">
-              <label>Password</label>
-              <div className="input-with-icon">
-                <Lock className="input-icon" size={16} />
-                <input 
-                  type="password" 
-                  placeholder="••••••••" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  minLength={6}
-                  required
-                />
+            {activeTab !== 'forgot' && (
+              <div className="auth-input-group">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <label style={{ marginBottom: 0 }}>Password</label>
+                  {activeTab === 'signin' && (
+                    <button 
+                      type="button" 
+                      className="forgot-password-link" 
+                      onClick={() => { setActiveTab('forgot'); setError(null); }}
+                    >
+                      Forgot Password?
+                    </button>
+                  )}
+                </div>
+                <div className="input-with-icon">
+                  <Lock className="input-icon" size={16} />
+                  <input 
+                    type="password" 
+                    placeholder="••••••••" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    minLength={6}
+                    required
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <button 
               type="submit" 
@@ -192,8 +264,12 @@ const AuthPage: React.FC = () => {
                   <Loader2 className="spinning" size={18} />
                   <span>Processing secure authentication...</span>
                 </>
+              ) : activeTab === 'forgot' ? (
+                'Send Password Recovery Email'
+              ) : activeTab === 'signup' ? (
+                'Register & Sync Predictions'
               ) : (
-                activeTab === 'signup' ? 'Register & Sync Predictions' : 'Log In & Retrieve Selections'
+                'Log In & Retrieve Selections'
               )}
             </button>
           </form>

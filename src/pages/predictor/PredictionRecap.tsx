@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Share2, ClipboardCheck, ArrowLeftRight } from 'lucide-react';
 import { usePredictor } from '../../context/PredictorContext';
@@ -17,6 +17,12 @@ const PredictionRecap: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedId, setSubmittedId] = useState<string | null>(() => localStorage.getItem('wc2026_submitted_id'));
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/predict/groups');
+    }
+  }, [user, navigate]);
 
   const championId = knockoutPredictions['104'];
 

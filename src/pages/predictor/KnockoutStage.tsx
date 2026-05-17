@@ -106,10 +106,16 @@ const playStadiumCheer = () => {
 
 const KnockoutStage: React.FC = () => {
   const navigate = useNavigate();
-  const { knockoutPredictions, handleKnockoutWinner, getTeamBySlot } = usePredictor();
+  const { knockoutPredictions, handleKnockoutWinner, getTeamBySlot, user } = usePredictor();
   const [knockoutRound, setKnockoutRound] = useState<'R32' | 'R16' | 'QF' | 'SF' | 'F' | '3RD'>('R32');
   const [comparisonTeams, setComparisonTeams] = useState<{ t1: Team; t2: Team } | null>(null);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/predict/groups');
+    }
+  }, [user, navigate]);
 
   const handleOpenComparison = (t1: Team, t2: Team) => {
     setComparisonTeams({ t1, t2 });
