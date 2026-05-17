@@ -21,7 +21,11 @@ interface PredictorContextType {
   isSharedMode: boolean;
   sharedUsername: string | null;
   sharedScore: number;
-  enterSharedMode: (username: string, selections: any, score: number) => void;
+  enterSharedMode: (username: string, selections: {
+    predictions: Record<string, string[]>;
+    thirdPlaceSelected: string[];
+    knockoutPredictions: Record<string, string>;
+  }, score: number) => void;
   exitSharedMode: () => void;
 }
 

@@ -43,9 +43,9 @@ const SharedBracketViewer: React.FC = () => {
 
         // Redirect seamlessly to the prediction Recap page
         navigate('/predict/recap');
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching shared bracket:', err);
-        setError(err.message || 'An error occurred while loading the shared bracket.');
+        setError(err instanceof Error ? err.message : 'An error occurred while loading the shared bracket.');
       } finally {
         setLoading(false);
       }

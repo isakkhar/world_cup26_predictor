@@ -154,9 +154,9 @@ const PredictionRecap: React.FC = () => {
       // 4. Save submission ID in local storage to keep state persistent
       localStorage.setItem('wc2026_submitted_id', data.id);
       setSubmittedId(data.id);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error submitting predictions:', err);
-      setSubmitError(err.message || 'Failed to write data. Please check connection and try again.');
+      setSubmitError(err instanceof Error ? err.message : 'Failed to write data. Please check connection and try again.');
     } finally {
       setSubmitting(false);
     }
