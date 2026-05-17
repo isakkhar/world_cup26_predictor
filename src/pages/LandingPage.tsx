@@ -128,11 +128,11 @@ const LandingPage: React.FC = () => {
           </div>
           <div className="footer-contact">
             <span>Sakkhar Saha</span>
-            <span>isakkhar@gmail.com</span>
+            <span><a href="mailto:isakkhar@gmail.com">isakkhar@gmail.com</a></span>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2026 • Designed AI Sakkhar Saha</p>
+          <p>© 2026 • Designed & Developed by <a href="https://github.com/isakkhar" target="_blank" rel="noopener noreferrer">Sakkhar</a></p>
         </div>
       </footer>
     </div>
