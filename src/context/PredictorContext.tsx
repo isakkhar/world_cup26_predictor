@@ -4,6 +4,8 @@ import type { ReactNode } from 'react';
 import { tournamentData, getTeamColors } from '../data/tournament';
 import type { Team } from '../data/tournament';
 import { knockoutStructure } from '../data/bracket';
+import { supabase } from '../lib/supabase';
+import type { User } from '@supabase/supabase-js';
 
 interface PredictorContextType {
   theme: 'dark' | 'light';
@@ -27,6 +29,10 @@ interface PredictorContextType {
     knockoutPredictions: Record<string, string>;
   }, score: number) => void;
   exitSharedMode: () => void;
+  user: User | null;
+  authLoading: boolean;
+  signOut: () => Promise<void>;
+  savePredictionsToSupabase: (username: string) => Promise<string>;
 }
 
 const PredictorContext = createContext<PredictorContextType | undefined>(undefined);
@@ -78,6 +84,154 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     thirdPlace: string[];
     knockouts: Record<string, string>;
   } | null>(null);
+
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  const savePredictionsToSupabaseInternal = async (
+    userId: string,
+    username: string,
+    selectionsData: {
+      predictions: Record<string, string[]>;
+      thirdPlaceSelected: string[];
+      knockoutPredictions: Record<string, string>;
+    }
+  ) => {
+    const score = 200 + Math.floor(Math.random() * 240);
+    const { data, error } = await supabase
+      .from('predictions')
+      .upsert([
+        {
+          user_id: userId,
+          username: username,
+          selections: selectionsData,
+          score: score
+        }
+      ], { onConflict: 'user_id' })
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+    if (data) {
+      localStorage.setItem('wc2026_submitted_id', data.id);
+    }
+    return data?.id || '';
+  };
+
+  const savePredictionsToSupabase = async (username: string): Promise<string> => {
+    if (!user) {
+      throw new Error('User must be logged in to save predictions.');
+    }
+    return savePredictionsToSupabaseInternal(user.id, username, {
+      predictions,
+      thirdPlaceSelected,
+      knockoutPredictions
+    });
+  };
+
+  const fetchUserPredictions = async (userId: string, currentUserObj: User | null) => {
+    try {
+      const { data, error } = await supabase
+        .from('predictions')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data) {
+        if (data.selections) {
+          setPredictions(data.selections.predictions || {});
+          setThirdPlaceSelected(data.selections.thirdPlaceSelected || []);
+          setKnockoutPredictions(data.selections.knockoutPredictions || {});
+        }
+      } else {
+        const savedPreds = localStorage.getItem('wc2026_predictions');
+        const savedThird = localStorage.getItem('wc2026_third_place');
+        const savedKnock = localStorage.getItem('wc2026_knockouts');
+        
+        let localPreds = {};
+        let localThird: string[] = [];
+        let localKnock = {};
+
+        try { localPreds = savedPreds ? JSON.parse(savedPreds) : {}; } catch { /* ignore */ }
+        try { localThird = savedThird ? JSON.parse(savedThird) : []; } catch { /* ignore */ }
+        try { localKnock = savedKnock ? JSON.parse(savedKnock) : {}; } catch { /* ignore */ }
+
+        const hasLocal = Object.keys(localPreds).length > 0 || localThird.length > 0 || Object.keys(localKnock).length > 0;
+        if (hasLocal) {
+          const userMetadata = currentUserObj?.user_metadata || {};
+          const displayName = userMetadata.username || userMetadata.full_name || currentUserObj?.email?.split('@')[0] || 'Predictor';
+          await savePredictionsToSupabaseInternal(userId, displayName, {
+            predictions: localPreds,
+            thirdPlaceSelected: localThird,
+            knockoutPredictions: localKnock
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching user predictions:', err);
+    }
+  };
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
+    localStorage.removeItem('wc2026_submitted_id');
+    localStorage.removeItem('wc2026_predictions');
+    localStorage.removeItem('wc2026_third_place');
+    localStorage.removeItem('wc2026_knockouts');
+    setPredictions({});
+    setThirdPlaceSelected([]);
+    setKnockoutPredictions({});
+  };
+
+  useEffect(() => {
+    const getInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const activeUser = session?.user || null;
+        setUser(activeUser);
+        if (activeUser) {
+          await fetchUserPredictions(activeUser.id, activeUser);
+        }
+      } catch (err) {
+        console.error('Error getting initial session:', err);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+
+    getInitialSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const activeUser = session?.user || null;
+      setUser(activeUser);
+      setAuthLoading(false);
+
+      if (event === 'SIGNED_IN' && activeUser) {
+        await fetchUserPredictions(activeUser.id, activeUser);
+      } else if (event === 'SIGNED_OUT') {
+        localStorage.removeItem('wc2026_submitted_id');
+        localStorage.removeItem('wc2026_predictions');
+        localStorage.removeItem('wc2026_third_place');
+        localStorage.removeItem('wc2026_knockouts');
+        setPredictions({});
+        setThirdPlaceSelected([]);
+        setKnockoutPredictions({});
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     document.body.className = `theme-${theme}`;
@@ -356,8 +510,21 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const resetAll = () => {
-    localStorage.clear();
-    window.location.reload();
+    localStorage.removeItem('wc2026_predictions');
+    localStorage.removeItem('wc2026_third_place');
+    localStorage.removeItem('wc2026_knockouts');
+    localStorage.removeItem('wc2026_submitted_id');
+    setPredictions({});
+    setThirdPlaceSelected([]);
+    setKnockoutPredictions({});
+
+    if (user) {
+      supabase.from('predictions').delete().eq('user_id', user.id).then(() => {
+        window.location.reload();
+      });
+    } else {
+      window.location.reload();
+    }
   };
 
   return (
@@ -368,7 +535,8 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       getTeamBySlot, getQualifiedTeamsList, resetAll,
       simulateTournament,
       isSharedMode, sharedUsername, sharedScore,
-      enterSharedMode, exitSharedMode
+      enterSharedMode, exitSharedMode,
+      user, authLoading, signOut, savePredictionsToSupabase
     }}>
       {children}
     </PredictorContext.Provider>

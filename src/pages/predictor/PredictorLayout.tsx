@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Trophy, Sun, Moon, Download, RotateCcw } from 'lucide-react';
+import { Home, Trophy, Sun, Moon, Download, RotateCcw, User as UserIcon, LogOut } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { usePredictor } from '../../context/PredictorContext';
 import Modal from '../../components/ui/Modal';
@@ -9,7 +9,8 @@ import './Predictor.css';
 const PredictorLayout: React.FC = () => {
   const { 
     theme, toggleTheme, resetAll, simulateTournament,
-    isSharedMode, sharedUsername, sharedScore, exitSharedMode
+    isSharedMode, sharedUsername, sharedScore, exitSharedMode,
+    user, authLoading, signOut
   } = usePredictor();
   const location = useLocation();
   const navigate = useNavigate();
@@ -67,6 +68,38 @@ const PredictorLayout: React.FC = () => {
           <p>Make your picks and crown the world champion!</p>
           <div className="header-actions-right">
             <button className="theme-toggle" onClick={toggleTheme}>{theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}</button>
+            
+            {!authLoading && (
+              user ? (
+                <>
+                  <div className="header-user-badge" title={user.email || ''}>
+                    <UserIcon size={14} />
+                    <span>{user.user_metadata?.username || user.email?.split('@')[0]}</span>
+                  </div>
+                  <button 
+                    className="auth-header-btn logout" 
+                    onClick={() => {
+                      if (confirm('Are you sure you want to log out and clear active session?')) {
+                        signOut();
+                      }
+                    }}
+                    title="Log Out"
+                  >
+                    <LogOut size={14} />
+                    <span>Sign Out</span>
+                  </button>
+                </>
+              ) : (
+                <button 
+                  className="auth-header-btn login" 
+                  onClick={() => navigate('/predict/auth')}
+                >
+                  <UserIcon size={14} />
+                  <span>Sign In</span>
+                </button>
+              )
+            )}
+
             <button className="download-btn" onClick={handleDownload} disabled={isDownloading || activeTab !== 'knockouts'}>
               {isDownloading ? <RotateCcw className="spinning" size={20} /> : <Download size={20} />}
             </button>

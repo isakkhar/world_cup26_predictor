@@ -8,6 +8,7 @@ import PredictionRecap from './pages/predictor/PredictionRecap';
 import GlobalTrends from './pages/predictor/GlobalTrends';
 import Leaderboard from './pages/predictor/Leaderboard';
 import SharedBracketViewer from './pages/predictor/SharedBracketViewer';
+import AuthPage from './pages/predictor/AuthPage';
 import { PredictorProvider } from './context/PredictorContext';
 import './index.css';
 
@@ -27,6 +28,7 @@ function App() {
               <Route path="trends" element={<GlobalTrends />} />
               <Route path="leaderboard" element={<Leaderboard />} />
               <Route path="share" element={<SharedBracketViewer />} />
+              <Route path="auth" element={<AuthPage />} />
             </Route>
           </Routes>
         </div>
