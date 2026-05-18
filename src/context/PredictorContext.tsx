@@ -33,6 +33,8 @@ interface PredictorContextType {
   authLoading: boolean;
   signOut: () => Promise<void>;
   savePredictionsToSupabase: (username: string) => Promise<string>;
+  isGuestMode: boolean;
+  enableGuestMode: () => void;
 }
 
 const PredictorContext = createContext<PredictorContextType | undefined>(undefined);
@@ -43,6 +45,14 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       return (localStorage.getItem('wc2026_theme') as 'dark' | 'light') || 'dark';
     } catch {
       return 'dark';
+    }
+  });
+
+  const [isGuestMode, setIsGuestMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('wc2026_guest_mode') === 'true';
+    } catch {
+      return false;
     }
   });
 
@@ -184,10 +194,12 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       console.error('Error contacting Supabase during sign out:', err);
     } finally {
       setUser(null);
+      setIsGuestMode(false);
       localStorage.removeItem('wc2026_submitted_id');
       localStorage.removeItem('wc2026_predictions');
       localStorage.removeItem('wc2026_third_place');
       localStorage.removeItem('wc2026_knockouts');
+      localStorage.removeItem('wc2026_guest_mode');
       setPredictions({});
       setThirdPlaceSelected([]);
       setKnockoutPredictions({});
@@ -218,15 +230,25 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       setAuthLoading(false);
 
       if (event === 'SIGNED_IN' && activeUser) {
+        setIsGuestMode(false);
+        localStorage.removeItem('wc2026_guest_mode');
         await fetchUserPredictions(activeUser.id, activeUser);
       } else if (event === 'SIGNED_OUT') {
+        const wasGuest = localStorage.getItem('wc2026_guest_mode') === 'true';
+        if (wasGuest) {
+          setIsGuestMode(true);
+          return;
+        }
+
         localStorage.removeItem('wc2026_submitted_id');
         localStorage.removeItem('wc2026_predictions');
         localStorage.removeItem('wc2026_third_place');
         localStorage.removeItem('wc2026_knockouts');
+        localStorage.removeItem('wc2026_guest_mode');
         setPredictions({});
         setThirdPlaceSelected([]);
         setKnockoutPredictions({});
+        setIsGuestMode(false);
       }
     });
 
@@ -512,14 +534,21 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     setKnockoutPredictions(newKnockoutPredictions);
   };
 
+  const enableGuestMode = () => {
+    setIsGuestMode(true);
+    localStorage.setItem('wc2026_guest_mode', 'true');
+  };
+
   const resetAll = () => {
     localStorage.removeItem('wc2026_predictions');
     localStorage.removeItem('wc2026_third_place');
     localStorage.removeItem('wc2026_knockouts');
     localStorage.removeItem('wc2026_submitted_id');
+    localStorage.removeItem('wc2026_guest_mode');
     setPredictions({});
     setThirdPlaceSelected([]);
     setKnockoutPredictions({});
+    setIsGuestMode(false);
 
     if (user) {
       supabase.from('predictions').delete().eq('user_id', user.id).then(() => {
@@ -539,7 +568,8 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       simulateTournament,
       isSharedMode, sharedUsername, sharedScore,
       enterSharedMode, exitSharedMode,
-      user, authLoading, signOut, savePredictionsToSupabase
+      user, authLoading, signOut, savePredictionsToSupabase,
+      isGuestMode, enableGuestMode
     }}>
       {children}
     </PredictorContext.Provider>

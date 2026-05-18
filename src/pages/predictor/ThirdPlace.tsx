@@ -4,19 +4,26 @@ import { Check, ArrowRight, Info } from 'lucide-react';
 import { tournamentData } from '../../data/tournament';
 import type { Team } from '../../data/tournament';
 import { usePredictor } from '../../context/PredictorContext';
+import { useSEO } from '../../hooks/useSEO';
 import Modal from '../../components/ui/Modal';
 
 const ThirdPlace: React.FC = () => {
-  const { predictions, thirdPlaceSelected, toggleThirdPlaceTeam, getQualifiedTeamsList, user } = usePredictor();
+  const { predictions, thirdPlaceSelected, toggleThirdPlaceTeam, getQualifiedTeamsList, user, isGuestMode } = usePredictor();
   const navigate = useNavigate();
+
+  useSEO({
+    title: 'Best Third-Place Qualifiers',
+    description: 'Select the 8 best 3rd-place teams to qualify for the 2026 World Cup Round of 32. Simulate tie-breaking metrics offline.',
+    keywords: 'World Cup 3rd Place qualifiers, 2026 tie-breakers, Round of 32 simulation'
+  });
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) {
+    if (!user && !isGuestMode) {
       navigate('/predict/groups');
     }
-  }, [user, navigate]);
+  }, [user, isGuestMode, navigate]);
 
   const showTeamStats = (team: Team) => {
     setSelectedTeam(team);

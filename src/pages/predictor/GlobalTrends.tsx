@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Trophy, Globe, AlertCircle } from 'lucide-react';
 import { usePredictor } from '../../context/PredictorContext';
+import { useSEO } from '../../hooks/useSEO';
 import './Predictor.css';
 
 interface TrendItem {
@@ -24,6 +25,13 @@ interface ContinentTrend {
 
 const GlobalTrends: React.FC = () => {
   const { getTeamBySlot } = usePredictor();
+
+  useSEO({
+    title: 'Global Prediction Heatmap & Fan Trends',
+    description: 'Explore live predictions from over 1.2 million World Cup fans. See regional favorites, top predicted champions, and compare your choices.',
+    keywords: 'World Cup trends, Global favorites, live predictions count, 2026 champion popularity'
+  });
+
   const [globalVotes, setGlobalVotes] = useState(1248530);
   const [isSimulating, setIsSimulating] = useState(false);
   const [activeTab, setActiveTab] = useState<'chart' | 'heatmap'>('chart');
