@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User as UserIcon, Loader2, ArrowLeft, ShieldCheck, AlertCircle, Inbox, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { usePredictor } from '../../context/PredictorContext';
 import './Predictor.css';
 
 const AuthPage: React.FC = () => {
+  const { enableGuestMode } = usePredictor();
   const [activeTab, setActiveTab] = useState<'signin' | 'signup' | 'forgot'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -303,6 +305,25 @@ const AuthPage: React.FC = () => {
               )}
             </button>
           </form>
+        )}
+
+        {/* Guest Mode Action Button */}
+        {activeTab !== 'forgot' && !success && !resetSent && (
+          <div className="auth-guest-option animate-fade-in">
+            <div className="auth-separator">
+              <span>or</span>
+            </div>
+            <button
+              type="button"
+              className="auth-guest-btn"
+              onClick={() => {
+                enableGuestMode();
+                navigate('/predict/recap');
+              }}
+            >
+              Continue as Guest 👤 (Play Offline)
+            </button>
+          </div>
         )}
       </div>
     </div>

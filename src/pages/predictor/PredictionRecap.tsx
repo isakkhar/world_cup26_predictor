@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Trophy, Share2, ClipboardCheck, ArrowLeftRight } from 'lucide-react';
 import { usePredictor } from '../../context/PredictorContext';
 import { tournamentData } from '../../data/tournament';
+import { useSEO } from '../../hooks/useSEO';
 import './Predictor.css';
 
 const PredictionRecap: React.FC = () => {
@@ -10,8 +11,14 @@ const PredictionRecap: React.FC = () => {
   const { 
     knockoutPredictions, getTeamBySlot, thirdPlaceSelected,
     isSharedMode, sharedUsername, sharedScore, exitSharedMode,
-    user, savePredictionsToSupabase
+    user, savePredictionsToSupabase, isGuestMode
   } = usePredictor();
+
+  useSEO({
+    title: isSharedMode ? `${sharedUsername || 'User'}'s Predictions Recap` : 'Predictions Recap',
+    description: 'Check out your final 2026 World Cup predictions. View the predicted champion, final podium, and share your custom bracket with friends!',
+    keywords: 'World Cup bracket recap, Predicted champion 2026, Share bracket'
+  });
 
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -21,10 +28,10 @@ const PredictionRecap: React.FC = () => {
   const championId = knockoutPredictions['104'];
 
   useEffect(() => {
-    if (!user) {
+    if (!user && !isGuestMode) {
       navigate('/predict/groups');
     }
-  }, [user, navigate]);
+  }, [user, isGuestMode, navigate]);
 
   // Auto-sync predictions to Supabase when arriving at the recap page
   useEffect(() => {

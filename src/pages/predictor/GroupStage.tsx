@@ -4,11 +4,18 @@ import { Info, ArrowRight } from 'lucide-react';
 import { tournamentData } from '../../data/tournament';
 import type { Team } from '../../data/tournament';
 import { usePredictor } from '../../context/PredictorContext';
+import { useSEO } from '../../hooks/useSEO';
 import Modal from '../../components/ui/Modal';
 
 const GroupStage: React.FC = () => {
-  const { predictions, handleRankTeam } = usePredictor();
+  const { predictions, handleRankTeam, user, isGuestMode } = usePredictor();
   const navigate = useNavigate();
+  
+  useSEO({
+    title: 'Group Stage Predictions',
+    description: 'Rank the 2026 FIFA World Cup group stage teams. Order countries by 1st, 2nd, and 3rd place to determine who advances to the knockout brackets.',
+    keywords: 'World Cup Groups, 2026 World Cup Bracket, Group Stage Simulator, Football predictions'
+  });
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
 
@@ -54,7 +61,18 @@ const GroupStage: React.FC = () => {
         ))}
       </div>
       <footer className="predictor-footer">
-        <button className="continue-button" onClick={() => navigate('/predict/third-place')}>CONTINUE TO THIRD PLACE <ArrowRight size={20} /></button>
+        <button 
+          className="continue-button" 
+          onClick={() => {
+            if (!user && !isGuestMode) {
+              navigate('/predict/auth');
+            } else {
+              navigate('/predict/third-place');
+            }
+          }}
+        >
+          CONTINUE TO THIRD PLACE <ArrowRight size={20} />
+        </button>
       </footer>
 
       <Modal isOpen={isStatsModalOpen} onClose={() => setIsStatsModalOpen(false)} title="Team Analysis" hideCancel={true} confirmText="Close" onConfirm={() => setIsStatsModalOpen(false)}>

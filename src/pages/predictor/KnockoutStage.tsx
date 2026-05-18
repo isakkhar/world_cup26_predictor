@@ -6,8 +6,10 @@ import { knockoutStructure } from '../../data/bracket';
 import { usePredictor } from '../../context/PredictorContext';
 import type { Team } from '../../data/tournament';
 import Modal from '../../components/ui/Modal';
+import { useSEO } from '../../hooks/useSEO';
 
 const matchDetails: Record<string, { date: string; venue: string; city: string }> = {
+// ... (matches static object metadata continues)
   // Round of 32
   '73': { date: 'June 28, 2026', venue: 'SoFi Stadium', city: 'Los Angeles, USA' },
   '74': { date: 'June 28, 2026', venue: 'BMO Field', city: 'Toronto, Canada' },
@@ -106,16 +108,23 @@ const playStadiumCheer = () => {
 
 const KnockoutStage: React.FC = () => {
   const navigate = useNavigate();
-  const { knockoutPredictions, handleKnockoutWinner, getTeamBySlot, user } = usePredictor();
+  const { knockoutPredictions, handleKnockoutWinner, getTeamBySlot, user, isGuestMode } = usePredictor();
+  
+  useSEO({
+    title: 'Knockout Stage Simulator',
+    description: 'Simulate the Round of 32, Round of 16, Quarterfinals, Semifinals, and the Final. Predict the champion of the 48-team 2026 World Cup bracket.',
+    keywords: 'World Cup bracket simulator, Knockout Stage 2026, Round of 16 bracket, World Cup Champion prediction'
+  });
+
   const [knockoutRound, setKnockoutRound] = useState<'R32' | 'R16' | 'QF' | 'SF' | 'F' | '3RD'>('R32');
   const [comparisonTeams, setComparisonTeams] = useState<{ t1: Team; t2: Team } | null>(null);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) {
+    if (!user && !isGuestMode) {
       navigate('/predict/groups');
     }
-  }, [user, navigate]);
+  }, [user, isGuestMode, navigate]);
 
   const handleOpenComparison = (t1: Team, t2: Team) => {
     setComparisonTeams({ t1, t2 });

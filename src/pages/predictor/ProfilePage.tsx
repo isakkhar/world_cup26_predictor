@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { User as UserIcon, Mail, Calendar, Key, Loader2, CheckCircle2, AlertCircle, ShieldAlert, Eye, EyeOff } from 'lucide-react';
 import { usePredictor } from '../../context/PredictorContext';
 import { supabase } from '../../lib/supabase';
+import GuestDashboard from './GuestDashboard';
 import './Predictor.css';
 
 const ProfilePage: React.FC = () => {
-  const { user, signOut } = usePredictor();
+  const { user, signOut, isGuestMode } = usePredictor();
   const navigate = useNavigate();
 
   const [newPassword, setNewPassword] = useState('');
@@ -19,10 +20,12 @@ const ProfilePage: React.FC = () => {
   const [hasBracket, setHasBracket] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!user && !isGuestMode) {
       navigate('/predict/groups');
       return;
     }
+
+    if (!user) return;
 
     const checkActiveBracket = async () => {
       try {
@@ -40,8 +43,9 @@ const ProfilePage: React.FC = () => {
     };
 
     checkActiveBracket();
-  }, [user, navigate]);
+  }, [user, isGuestMode, navigate]);
 
+  if (!user && isGuestMode) return <GuestDashboard />;
   if (!user) return null;
 
   const handlePasswordChange = async (e: React.FormEvent) => {

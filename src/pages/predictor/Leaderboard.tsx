@@ -3,6 +3,7 @@ import { Trophy, Medal, HelpCircle, Star, Loader2, RefreshCw, Crown, Flame, Tren
 import { supabase } from '../../lib/supabase';
 import { usePredictor } from '../../context/PredictorContext';
 import { useNavigate } from 'react-router-dom';
+import { useSEO } from '../../hooks/useSEO';
 import './Predictor.css';
 
 interface LeaderboardEntry {
@@ -44,6 +45,12 @@ const Leaderboard: React.FC = () => {
   const [animatedCount, setAnimatedCount] = useState(0);
   const navigate = useNavigate();
   const { enterSharedMode } = usePredictor();
+
+  useSEO({
+    title: 'Global Fan Leaderboard',
+    description: 'Check out the live 2026 World Cup Predictor global rankings. View top scoring brackets, points distributions, and standings.',
+    keywords: 'World Cup points leaderboard, bracket standings, global fan rank, top football forecasts'
+  });
 
   const submittedId = localStorage.getItem('wc2026_submitted_id');
 

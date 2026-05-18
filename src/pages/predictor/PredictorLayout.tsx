@@ -9,19 +9,21 @@ const PredictorLayout: React.FC = () => {
   const { 
     theme, toggleTheme, resetAll, simulateTournament,
     isSharedMode, sharedUsername, sharedScore, exitSharedMode,
-    user, authLoading, signOut
+    user, authLoading, signOut, isGuestMode, enableGuestMode
   } = usePredictor();
   const location = useLocation();
   const navigate = useNavigate();
   const [isSimModalOpen, setIsSimModalOpen] = useState(false);
   const [isGateModalOpen, setIsGateModalOpen] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   const activeTab = location.pathname.split('/').pop() || 'groups';
 
 
 
   const handleRestrictedTabClick = (path: string) => {
-    if (!user) {
+    if (!user && !isGuestMode) {
+      setPendingPath(path);
       setIsGateModalOpen(true);
     } else {
       navigate(path);
@@ -38,6 +40,19 @@ const PredictorLayout: React.FC = () => {
             </span>
             <button className="exit-shared-btn" onClick={exitSharedMode}>Exit Shared View</button>
           </div>
+        </div>
+      )}
+
+      {isGuestMode && !user && !isSharedMode && (
+        <div className="guest-info-banner animate-fade-in">
+          <div className="guest-banner-glow"></div>
+          <span className="guest-banner-icon">👤</span>
+          <span className="guest-banner-text">
+            <strong>Guest Mode Active:</strong> Your predictions are saved locally on this browser.
+          </span>
+          <button className="guest-banner-cta" onClick={() => navigate('/predict/auth')}>
+            Sync to Cloud / Register 🔐
+          </button>
         </div>
       )}
 
@@ -94,10 +109,10 @@ const PredictorLayout: React.FC = () => {
         <div className="predictor-top-bar">
           <div className="nav-tabs">
             <button className={`tab-button ${activeTab === 'groups' ? 'active' : ''}`} onClick={() => navigate('/predict/groups')}>Group Stage</button>
-            <button className={`tab-button ${activeTab === 'third-place' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/third-place')}>Third Place {!user && '🔒'}</button>
-            <button className={`tab-button ${activeTab === 'knockouts' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/knockouts')}>Knockouts {!user && '🔒'}</button>
-            <button className={`tab-button ${activeTab === 'recap' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/recap')}>Recap {!user && '🔒'}</button>
-            <button className={`tab-button ${activeTab === 'trends' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/trends')}>Trends {!user && '🔒'}</button>
+            <button className={`tab-button ${activeTab === 'third-place' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/third-place')}>Third Place {!user && !isGuestMode && '🔒'}</button>
+            <button className={`tab-button ${activeTab === 'knockouts' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/knockouts')}>Knockouts {!user && !isGuestMode && '🔒'}</button>
+            <button className={`tab-button ${activeTab === 'recap' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/recap')}>Recap {!user && !isGuestMode && '🔒'}</button>
+            <button className={`tab-button ${activeTab === 'trends' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/trends')}>Trends {!user && !isGuestMode && '🔒'}</button>
             <button className={`tab-button ${activeTab === 'leaderboard' ? 'active' : ''}`} onClick={() => navigate('/predict/leaderboard')}>Leaderboard</button>
           </div>
           
@@ -106,8 +121,12 @@ const PredictorLayout: React.FC = () => {
               <button 
                 className="auto-simulate-btn" 
                 onClick={() => {
-                  if (!user) setIsGateModalOpen(true);
-                  else setIsSimModalOpen(true);
+                  if (!user && !isGuestMode) {
+                    setPendingPath('/predict/knockouts');
+                    setIsGateModalOpen(true);
+                  } else {
+                    setIsSimModalOpen(true);
+                  }
                 }}
               >
                 ⚡ AUTO SIMULATE
@@ -179,6 +198,21 @@ const PredictorLayout: React.FC = () => {
               }}
             >
               Sign In / Register Now
+            </button>
+            <button 
+              className="gate-guest-btn" 
+              onClick={() => {
+                setIsGateModalOpen(false);
+                enableGuestMode();
+                if (pendingPath) {
+                  navigate(pendingPath);
+                  setPendingPath(null);
+                } else {
+                  navigate('/predict/third-place');
+                }
+              }}
+            >
+              Continue as Guest 👤 (Play Offline)
             </button>
           </div>
         </div>

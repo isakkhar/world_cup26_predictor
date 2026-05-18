@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Home & Entry Page -->
+  <url>
+    <loc>https://world-cup26-predictor.vercel.app/</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Group Stage Predictions -->
+  <url>
+    <loc>https://world-cup26-predictor.vercel.app/predict/groups</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Best Third Place Logic -->
+  <url>
+    <loc>https://world-cup26-predictor.vercel.app/predict/third-place</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Knockouts Stage Bracket Simulation -->
+  <url>
+    <loc>https://world-cup26-predictor.vercel.app/predict/knockouts</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Predictions Recap -->
+  <url>
+    <loc>https://world-cup26-predictor.vercel.app/predict/recap</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Global Predictions Trends -->
+  <url>
+    <loc>https://world-cup26-predictor.vercel.app/predict/trends</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Global Points Leaderboard -->
+  <url>
+    <loc>https://world-cup26-predictor.vercel.app/predict/leaderboard</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- User Profile / Guest Dashboard -->
+  <url>
+    <loc>https://world-cup26-predictor.vercel.app/predict/profile</loc>
+    <lastmod>2026-05-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>

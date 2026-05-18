@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /predict/auth
+
+# Sitemap link (Replace with your actual production domain when deployed)
+Sitemap: https://YOUR_DOMAIN_HERE.com/sitemap.xml
