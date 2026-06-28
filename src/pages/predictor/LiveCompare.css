@@ -501,3 +501,150 @@
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
 }
+
+/* --- Light Theme Overrides --- */
+.theme-light .accuracy-main-card {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-color: rgba(37, 99, 235, 0.15);
+}
+
+.theme-light .accuracy-percentage {
+  color: #2563eb;
+  text-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
+}
+
+.theme-light .accuracy-label {
+  color: #475569;
+}
+
+.theme-light .points-val {
+  color: #1e293b;
+}
+
+.theme-light .points-sub {
+  color: #475569;
+}
+
+.theme-light .live-sync-indicator-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.theme-light .live-sync-header-row h4 {
+  color: #1e293b;
+}
+
+.theme-light .sync-refresh-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.theme-light .sync-refresh-btn:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.theme-light .sync-desc {
+  color: #64748b;
+}
+
+.theme-light .metric-box {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.theme-light .metric-header .title {
+  color: #475569;
+}
+
+.theme-light .metric-header .accuracy {
+  color: #0f172a;
+}
+
+.theme-light .metric-progress-wrapper {
+  background: #e2e8f0;
+}
+
+.theme-light .metric-box .details {
+  color: #64748b;
+}
+
+.theme-light .compare-tab {
+  color: #64748b;
+}
+
+.theme-light .compare-tab:hover {
+  color: #1e293b;
+}
+
+.theme-light .compare-tab.active {
+  color: #3b82f6;
+}
+
+.theme-light .compare-group-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.theme-light .compare-group-card h5 {
+  color: #0f172a;
+}
+
+.theme-light .standings-table-header {
+  color: #94a3b8;
+}
+
+.theme-light .position-idx {
+  color: #64748b;
+}
+
+.theme-light .team-col {
+  color: #334155;
+}
+
+.theme-light .standings-compare-row.match {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.15);
+}
+
+.theme-light .standings-compare-row.mismatch {
+  background: rgba(239, 68, 68, 0.02);
+  border-color: rgba(239, 68, 68, 0.06);
+}
+
+.theme-light .compare-match-row-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.theme-light .match-row-header span:first-child {
+  color: #64748b;
+}
+
+.theme-light .col-matchup .team-panel {
+  color: #0f172a;
+}
+
+.theme-light .col-matchup .vs {
+  color: #94a3b8;
+}
+
+.theme-light .col-prediction .lbl,
+.theme-light .col-actual .lbl {
+  color: #64748b;
+}
+
+.theme-light .winner-display {
+  color: #334155;
+}
+
+.theme-light .winner-display strong {
+  color: #0f172a;
+}
+
+.theme-light .status-pill.scheduled {
+  background: #f1f5f9;
+  color: #475569;
+}

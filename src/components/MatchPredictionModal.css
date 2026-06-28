@@ -498,3 +498,194 @@
 .mp-alert-icon {
   font-weight: bold;
 }
+
+/* --- Light Theme Overrides --- */
+.theme-light .mp-modal-content {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  color: #1e293b;
+}
+
+.theme-light .mp-modal-header h3 {
+  background: linear-gradient(90deg, #1d4ed8, #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.theme-light .mp-close-btn {
+  color: #64748b;
+}
+
+.theme-light .mp-close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+.theme-light .mp-score-section {
+  background: rgba(0, 0, 0, 0.015);
+  border-color: rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .mp-team-name {
+  color: #1e293b;
+}
+
+.theme-light .mp-score-stepper {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .mp-stepper-btn {
+  background: rgba(0, 0, 0, 0.04);
+  color: #334155;
+}
+
+.theme-light .mp-stepper-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.theme-light .mp-score-val {
+  color: #0f172a;
+}
+
+.theme-light .mp-vs-badge {
+  color: #64748b;
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .mp-settings-card {
+  background: rgba(0, 0, 0, 0.01);
+  border-color: rgba(0, 0, 0, 0.03);
+}
+
+.theme-light .mp-setting-label {
+  color: #475569;
+}
+
+.theme-light .mp-options-group {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .mp-option-btn {
+  color: #64748b;
+}
+
+.theme-light .mp-option-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.theme-light .mp-option-btn.active-green {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.theme-light .mp-setting-row.alert-row {
+  background: rgba(239, 68, 68, 0.04);
+}
+
+.theme-light .mp-scorers-section h4,
+.theme-light .mp-props-section h4 {
+  color: #334155;
+}
+
+.theme-light .mp-scorer-select,
+.theme-light .mp-scorer-text-input {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+}
+
+.theme-light .mp-add-scorer-btn {
+  background: #2563eb;
+}
+
+.theme-light .mp-add-scorer-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.theme-light .mp-quick-btn {
+  background: rgba(37, 99, 235, 0.04);
+  border-color: rgba(37, 99, 235, 0.15);
+  color: #2563eb;
+}
+
+.theme-light .mp-quick-btn:hover {
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.theme-light .mp-scorers-list {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.theme-light .mp-scorer-badge {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #1e293b;
+}
+
+.theme-light .mp-remove-scorer-btn {
+  color: #64748b;
+}
+
+.theme-light .mp-remove-scorer-btn:hover {
+  background: rgba(239, 68, 68, 0.05);
+  color: #ef4444;
+}
+
+.theme-light .mp-no-scorers-text {
+  color: #94a3b8;
+}
+
+.theme-light .mp-prop-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.theme-light .mp-prop-card:hover {
+  background: rgba(0, 0, 0, 0.01);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .mp-prop-title {
+  color: #1e293b;
+}
+
+.theme-light .mp-prop-desc {
+  color: #64748b;
+}
+
+.theme-light .mp-prop-stepper-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.theme-light .mp-prop-stepper {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.theme-light .mp-prop-btn {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.theme-light .mp-prop-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.theme-light .mp-prop-val {
+  color: #0f172a;
+}
+
+.theme-light .mp-footer-alert {
+  background: rgba(37, 99, 235, 0.04);
+  border-color: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+}
