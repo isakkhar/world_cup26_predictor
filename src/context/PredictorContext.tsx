@@ -7,6 +7,21 @@ import { knockoutStructure } from '../data/bracket';
 import { supabase } from '../lib/supabase';
 import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 
+export interface MatchScorer {
+  teamId: string;
+  playerName: string;
+}
+
+export interface MatchPrediction {
+  goals1: number | null;
+  goals2: number | null;
+  advanceMethod?: 'regular' | 'et' | 'pk';
+  scorers: MatchScorer[];
+  yellowCards?: number;
+  redCards?: boolean;
+  penalties?: boolean;
+}
+
 interface PredictorContextType {
   theme: 'dark' | 'light';
   toggleTheme: () => void;
@@ -16,6 +31,8 @@ interface PredictorContextType {
   toggleThirdPlaceTeam: (teamId: string) => void;
   knockoutPredictions: Record<string, string>;
   handleKnockoutWinner: (matchId: string, teamId: string) => void;
+  matchPredictions: Record<string, MatchPrediction>;
+  updateMatchPrediction: (matchId: string, prediction: Partial<MatchPrediction>) => void;
   getTeamBySlot: (slot: string) => Team | null;
   getQualifiedTeamsList: () => (Team | null)[];
   resetAll: () => void;
@@ -27,6 +44,7 @@ interface PredictorContextType {
     predictions: Record<string, string[]>;
     thirdPlaceSelected: string[];
     knockoutPredictions: Record<string, string>;
+    matchPredictions?: Record<string, MatchPrediction>;
   }, score: number) => void;
   exitSharedMode: () => void;
   user: User | null;
@@ -86,6 +104,16 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   });
 
+  const [matchPredictions, setMatchPredictions] = useState<Record<string, MatchPrediction>>(() => {
+    try {
+      const saved = localStorage.getItem('wc2026_match_predictions');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      console.error('Error parsing match predictions local storage:', e);
+      return {};
+    }
+  });
+
   const [isSharedMode, setIsSharedMode] = useState(false);
   const [sharedUsername, setSharedUsername] = useState<string | null>(null);
   const [sharedScore, setSharedScore] = useState(0);
@@ -93,6 +121,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     predictions: Record<string, string[]>;
     thirdPlace: string[];
     knockouts: Record<string, string>;
+    matchPredictions: Record<string, MatchPrediction>;
   } | null>(null);
 
   const [user, setUser] = useState<User | null>(null);
@@ -105,6 +134,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       predictions: Record<string, string[]>;
       thirdPlaceSelected: string[];
       knockoutPredictions: Record<string, string>;
+      matchPredictions?: Record<string, MatchPrediction>;
     }
   ) => {
     const score = 200 + Math.floor(Math.random() * 240);
@@ -137,7 +167,8 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     return savePredictionsToSupabaseInternal(user.id, username, {
       predictions,
       thirdPlaceSelected,
-      knockoutPredictions
+      knockoutPredictions,
+      matchPredictions
     });
   };
 
@@ -157,28 +188,33 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
           setPredictions(data.selections.predictions || {});
           setThirdPlaceSelected(data.selections.thirdPlaceSelected || []);
           setKnockoutPredictions(data.selections.knockoutPredictions || {});
+          setMatchPredictions(data.selections.matchPredictions || {});
         }
       } else {
         const savedPreds = localStorage.getItem('wc2026_predictions');
         const savedThird = localStorage.getItem('wc2026_third_place');
         const savedKnock = localStorage.getItem('wc2026_knockouts');
+        const savedMatch = localStorage.getItem('wc2026_match_predictions');
         
         let localPreds = {};
         let localThird: string[] = [];
         let localKnock = {};
+        let localMatch = {};
 
         try { localPreds = savedPreds ? JSON.parse(savedPreds) : {}; } catch { /* ignore */ }
         try { localThird = savedThird ? JSON.parse(savedThird) : []; } catch { /* ignore */ }
         try { localKnock = savedKnock ? JSON.parse(savedKnock) : {}; } catch { /* ignore */ }
+        try { localMatch = savedMatch ? JSON.parse(savedMatch) : {}; } catch { /* ignore */ }
 
-        const hasLocal = Object.keys(localPreds).length > 0 || localThird.length > 0 || Object.keys(localKnock).length > 0;
+        const hasLocal = Object.keys(localPreds).length > 0 || localThird.length > 0 || Object.keys(localKnock).length > 0 || Object.keys(localMatch).length > 0;
         if (hasLocal) {
           const userMetadata = currentUserObj?.user_metadata || {};
           const displayName = userMetadata.username || userMetadata.full_name || currentUserObj?.email?.split('@')[0] || 'Predictor';
           await savePredictionsToSupabaseInternal(userId, displayName, {
             predictions: localPreds,
             thirdPlaceSelected: localThird,
-            knockoutPredictions: localKnock
+            knockoutPredictions: localKnock,
+            matchPredictions: localMatch
           });
         }
       }
@@ -199,10 +235,12 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       localStorage.removeItem('wc2026_predictions');
       localStorage.removeItem('wc2026_third_place');
       localStorage.removeItem('wc2026_knockouts');
+      localStorage.removeItem('wc2026_match_predictions');
       localStorage.removeItem('wc2026_guest_mode');
       setPredictions({});
       setThirdPlaceSelected([]);
       setKnockoutPredictions({});
+      setMatchPredictions({});
     }
   };
 
@@ -244,10 +282,12 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
         localStorage.removeItem('wc2026_predictions');
         localStorage.removeItem('wc2026_third_place');
         localStorage.removeItem('wc2026_knockouts');
+        localStorage.removeItem('wc2026_match_predictions');
         localStorage.removeItem('wc2026_guest_mode');
         setPredictions({});
         setThirdPlaceSelected([]);
         setKnockoutPredictions({});
+        setMatchPredictions({});
         setIsGuestMode(false);
       }
     });
@@ -278,12 +318,18 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     localStorage.setItem('wc2026_knockouts', JSON.stringify(knockoutPredictions));
   }, [knockoutPredictions, isSharedMode]);
 
+  useEffect(() => {
+    if (isSharedMode) return;
+    localStorage.setItem('wc2026_match_predictions', JSON.stringify(matchPredictions));
+  }, [matchPredictions, isSharedMode]);
+
   const enterSharedMode = (
     username: string,
     selections: {
       predictions: Record<string, string[]>;
       thirdPlaceSelected: string[];
       knockoutPredictions: Record<string, string>;
+      matchPredictions?: Record<string, MatchPrediction>;
     },
     score: number
   ) => {
@@ -291,7 +337,8 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       setLocalBackup({
         predictions,
         thirdPlace: thirdPlaceSelected,
-        knockouts: knockoutPredictions
+        knockouts: knockoutPredictions,
+        matchPredictions
       });
     }
     setIsSharedMode(true);
@@ -300,6 +347,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     setPredictions(selections.predictions || {});
     setThirdPlaceSelected(selections.thirdPlaceSelected || []);
     setKnockoutPredictions(selections.knockoutPredictions || {});
+    setMatchPredictions(selections.matchPredictions || {});
   };
 
   const exitSharedMode = () => {
@@ -307,6 +355,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       setPredictions(localBackup.predictions);
       setThirdPlaceSelected(localBackup.thirdPlace);
       setKnockoutPredictions(localBackup.knockouts);
+      setMatchPredictions(localBackup.matchPredictions);
       setLocalBackup(null);
     }
     setIsSharedMode(false);
@@ -369,6 +418,83 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     return predictions;
   };
 
+  const getThirdPlaceSlotsMapping = (selectedThirdIds: string[]): Record<string, string> => {
+    const qualifiedGroupIds: { groupId: string; teamId: string }[] = [];
+    selectedThirdIds.forEach(teamId => {
+      for (const group of tournamentData) {
+        const team = group.teams.find(t => t.id === teamId);
+        if (team) {
+          qualifiedGroupIds.push({ groupId: group.id, teamId });
+          break;
+        }
+      }
+    });
+
+    const slots = [
+      { id: 'T1', allowed: ['A', 'B', 'C', 'D', 'F'] },
+      { id: 'T2', allowed: ['C', 'D', 'F', 'G', 'H'] },
+      { id: 'T3', allowed: ['C', 'E', 'F', 'H', 'I'] },
+      { id: 'T4', allowed: ['E', 'H', 'I', 'J', 'K'] },
+      { id: 'T5', allowed: ['B', 'E', 'F', 'I', 'J'] },
+      { id: 'T6', allowed: ['A', 'E', 'H', 'I', 'J'] },
+      { id: 'T7', allowed: ['E', 'F', 'G', 'I', 'J'] },
+      { id: 'T8', allowed: ['D', 'E', 'I', 'J', 'L'] }
+    ];
+
+    const result: Record<string, string> = {};
+    const used = new Set<string>();
+    const sortedQualified = [...qualifiedGroupIds].sort((a, b) => a.groupId.localeCompare(b.groupId));
+    const combinationKey = sortedQualified.map(q => q.groupId).join('_');
+
+    // Real-world 2026 World Cup combination: B_D_E_F_I_J_K_L
+    if (combinationKey === 'B_D_E_F_I_J_K_L') {
+      const mapping: Record<string, string> = {};
+      const findAndMap = (slotId: string, grp: string) => {
+        const team = sortedQualified.find(q => q.groupId === grp);
+        if (team) mapping[slotId] = team.teamId;
+      };
+      findAndMap('T1', 'D'); // Match 74: Germany vs Paraguay
+      findAndMap('T2', 'F'); // Match 77: France vs Sweden
+      findAndMap('T3', 'E'); // Match 79: Mexico vs Ecuador
+      findAndMap('T4', 'K'); // Match 80: England vs DR Congo
+      findAndMap('T5', 'B'); // Match 81: USA vs Bosnia
+      findAndMap('T6', 'I'); // Match 82: Belgium vs Senegal
+      findAndMap('T7', 'J'); // Match 85: Switzerland vs Algeria
+      findAndMap('T8', 'L'); // Match 87: Colombia vs Ghana
+      return mapping;
+    }
+
+    const backtrack = (slotIndex: number): boolean => {
+      if (slotIndex === slots.length) return true;
+      const slot = slots[slotIndex];
+      for (const team of sortedQualified) {
+        if (used.has(team.teamId)) continue;
+        if (slot.allowed.includes(team.groupId)) {
+          used.add(team.teamId);
+          result[slot.id] = team.teamId;
+          if (backtrack(slotIndex + 1)) return true;
+          used.delete(team.teamId);
+          delete result[slot.id];
+        }
+      }
+      return false;
+    };
+
+    if (backtrack(0)) {
+      return result;
+    }
+
+    const fallback: Record<string, string> = {};
+    sortedQualified.forEach((team, idx) => {
+      fallback[`T${idx + 1}`] = team.teamId;
+    });
+    return fallback;
+  };
+
+  const thirdPlaceSlotsMapping = React.useMemo(() => {
+    return getThirdPlaceSlotsMapping(thirdPlaceSelected);
+  }, [thirdPlaceSelected]);
+
   const getTeamBySlot = (slot: string): Team | null => {
     if (/^[A-L][1-3]$/.test(slot)) {
       const groupId = slot[0];
@@ -392,8 +518,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       return winnerId === t1.id ? t2 : t1;
     }
     if (/^T[1-8]$/.test(slot)) {
-      const index = parseInt(slot.substring(1)) - 1;
-      const teamId = thirdPlaceSelected[index];
+      const teamId = thirdPlaceSlotsMapping[slot];
       if (!teamId) return null;
       for (const group of tournamentData) {
         const team = group.teams.find(t => t.id === teamId);
@@ -469,6 +594,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
         })();
 
     const newThirdPlaceSelected = selectedThirdPlace.map(t => t.id);
+    const simulatedThirdPlaceSlotsMapping = getThirdPlaceSlotsMapping(newThirdPlaceSelected);
     const newKnockoutPredictions: Record<string, string> = {};
 
     const getLocalTeamBySlot = (slot: string, localKnockout: Record<string, string>): Team | null => {
@@ -494,8 +620,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
         return winnerId === t1.id ? t2 : t1;
       }
       if (/^T[1-8]$/.test(slot)) {
-        const index = parseInt(slot.substring(1)) - 1;
-        const teamId = newThirdPlaceSelected[index];
+        const teamId = simulatedThirdPlaceSlotsMapping[slot];
         if (!teamId) return null;
         for (const g of tournamentData) {
           const team = g.teams.find(t => t.id === teamId);
@@ -534,6 +659,20 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     setKnockoutPredictions(newKnockoutPredictions);
   };
 
+  const updateMatchPrediction = (matchId: string, prediction: Partial<MatchPrediction>) => {
+    if (isSharedMode) return;
+    setMatchPredictions(prev => {
+      const current = prev[matchId] || { goals1: null, goals2: null, scorers: [] };
+      return {
+        ...prev,
+        [matchId]: {
+          ...current,
+          ...prediction
+        }
+      };
+    });
+  };
+
   const enableGuestMode = () => {
     setIsGuestMode(true);
     localStorage.setItem('wc2026_guest_mode', 'true');
@@ -543,11 +682,13 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
     localStorage.removeItem('wc2026_predictions');
     localStorage.removeItem('wc2026_third_place');
     localStorage.removeItem('wc2026_knockouts');
+    localStorage.removeItem('wc2026_match_predictions');
     localStorage.removeItem('wc2026_submitted_id');
     localStorage.removeItem('wc2026_guest_mode');
     setPredictions({});
     setThirdPlaceSelected([]);
     setKnockoutPredictions({});
+    setMatchPredictions({});
     setIsGuestMode(false);
 
     if (user) {
@@ -564,6 +705,7 @@ export const PredictorProvider: React.FC<{ children: ReactNode }> = ({ children 
       theme, toggleTheme, predictions, handleRankTeam,
       thirdPlaceSelected, toggleThirdPlaceTeam,
       knockoutPredictions, handleKnockoutWinner,
+      matchPredictions, updateMatchPrediction,
       getTeamBySlot, getQualifiedTeamsList, resetAll,
       simulateTournament,
       isSharedMode, sharedUsername, sharedScore,

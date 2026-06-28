@@ -7,6 +7,7 @@ import { usePredictor } from '../../context/PredictorContext';
 import type { Team } from '../../data/tournament';
 import Modal from '../../components/ui/Modal';
 import { useSEO } from '../../hooks/useSEO';
+import MatchPredictionModal from '../../components/MatchPredictionModal';
 
 const matchDetails: Record<string, { date: string; venue: string; city: string }> = {
 // ... (matches static object metadata continues)
@@ -108,7 +109,7 @@ const playStadiumCheer = () => {
 
 const KnockoutStage: React.FC = () => {
   const navigate = useNavigate();
-  const { knockoutPredictions, handleKnockoutWinner, getTeamBySlot, user, isGuestMode } = usePredictor();
+  const { knockoutPredictions, handleKnockoutWinner, getTeamBySlot, user, isGuestMode, matchPredictions } = usePredictor();
   
   useSEO({
     title: 'Knockout Stage Simulator',
@@ -119,6 +120,15 @@ const KnockoutStage: React.FC = () => {
   const [knockoutRound, setKnockoutRound] = useState<'R32' | 'R16' | 'QF' | 'SF' | 'F' | '3RD'>('R32');
   const [comparisonTeams, setComparisonTeams] = useState<{ t1: Team; t2: Team } | null>(null);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
+  const [predictionMatch, setPredictionMatch] = useState<{
+    matchId: string;
+    t1: Team | null;
+    t2: Team | null;
+  } | null>(null);
+
+  const handleOpenPrediction = (matchId: string, t1: Team | null, t2: Team | null) => {
+    setPredictionMatch({ matchId, t1, t2 });
+  };
 
   useEffect(() => {
     if (!user && !isGuestMode) {
@@ -240,6 +250,21 @@ const KnockoutStage: React.FC = () => {
                   </div>
                 ))}
               </div>
+              {team1 && team2 && (() => {
+                const mPred = matchPredictions[match.id];
+                const hasScore = mPred && mPred.goals1 !== null && mPred.goals2 !== null;
+                return (
+                  <div className="ko-score-predict-trigger" onClick={() => handleOpenPrediction(match.id, team1, team2)}>
+                    {hasScore ? (
+                      <span className="predicted-score-label">
+                        Prediction: <strong>{mPred.goals1} - {mPred.goals2}</strong> {mPred.advanceMethod !== 'regular' && `(${mPred.advanceMethod === 'et' ? 'AET' : 'PEN'})`} ✏️
+                      </span>
+                    ) : (
+                      <span className="predict-score-prompt">⚽ Predict Score & Events</span>
+                    )}
+                  </div>
+                );
+              })()}
               {matchDetails[match.id] && (
                 <div className="ko-match-details">
                   <span className="detail-venue">{matchDetails[match.id].venue}</span>
@@ -365,6 +390,14 @@ const KnockoutStage: React.FC = () => {
           );
         })()}
       </Modal>
+
+      <MatchPredictionModal
+        isOpen={predictionMatch !== null}
+        onClose={() => setPredictionMatch(null)}
+        matchId={predictionMatch?.matchId || ''}
+        team1={predictionMatch?.t1 || null}
+        team2={predictionMatch?.t2 || null}
+      />
     </div>
   );
 };

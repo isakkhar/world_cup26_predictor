@@ -9,24 +9,24 @@ export interface BracketMatch {
 
 export const knockoutStructure: BracketMatch[] = [
   // ROUND OF 32 - LEFT
-  { id: '74', round: 'R32', team1Slot: 'E1', team2Slot: 'D2', nextMatchId: '89', side: 'left' },
-  { id: '77', round: 'R32', team1Slot: 'I1', team2Slot: 'G2', nextMatchId: '89', side: 'left' },
-  { id: '73', round: 'R32', team1Slot: 'A1', team2Slot: 'T1', nextMatchId: '90', side: 'left' },
+  { id: '74', round: 'R32', team1Slot: 'E1', team2Slot: 'T1', nextMatchId: '89', side: 'left' },
+  { id: '77', round: 'R32', team1Slot: 'I1', team2Slot: 'T2', nextMatchId: '89', side: 'left' },
+  { id: '73', round: 'R32', team1Slot: 'A2', team2Slot: 'B2', nextMatchId: '90', side: 'left' },
   { id: '75', round: 'R32', team1Slot: 'F1', team2Slot: 'C2', nextMatchId: '90', side: 'left' },
-  { id: '83', round: 'R32', team1Slot: 'L2', team2Slot: 'T3', nextMatchId: '93', side: 'left' },
-  { id: '84', round: 'R32', team1Slot: 'H1', team2Slot: 'T8', nextMatchId: '93', side: 'left' },
-  { id: '81', round: 'R32', team1Slot: 'D1', team2Slot: 'J2', nextMatchId: '94', side: 'left' },
-  { id: '82', round: 'R32', team1Slot: 'G1', team2Slot: 'T2', nextMatchId: '94', side: 'left' },
+  { id: '83', round: 'R32', team1Slot: 'K2', team2Slot: 'L2', nextMatchId: '93', side: 'left' },
+  { id: '84', round: 'R32', team1Slot: 'H1', team2Slot: 'J2', nextMatchId: '93', side: 'left' },
+  { id: '81', round: 'R32', team1Slot: 'D1', team2Slot: 'T5', nextMatchId: '94', side: 'left' },
+  { id: '82', round: 'R32', team1Slot: 'G1', team2Slot: 'T6', nextMatchId: '94', side: 'left' },
 
   // ROUND OF 32 - RIGHT
   { id: '76', round: 'R32', team1Slot: 'C1', team2Slot: 'F2', nextMatchId: '91', side: 'right' },
   { id: '78', round: 'R32', team1Slot: 'E2', team2Slot: 'I2', nextMatchId: '91', side: 'right' },
-  { id: '79', round: 'R32', team1Slot: 'A2', team2Slot: 'T4', nextMatchId: '92', side: 'right' },
-  { id: '80', round: 'R32', team1Slot: 'L1', team2Slot: 'K2', nextMatchId: '92', side: 'right' },
+  { id: '79', round: 'R32', team1Slot: 'A1', team2Slot: 'T3', nextMatchId: '92', side: 'right' },
+  { id: '80', round: 'R32', team1Slot: 'L1', team2Slot: 'T4', nextMatchId: '92', side: 'right' },
   { id: '86', round: 'R32', team1Slot: 'J1', team2Slot: 'H2', nextMatchId: '95', side: 'right' },
-  { id: '88', round: 'R32', team1Slot: 'B2', team2Slot: 'T6', nextMatchId: '95', side: 'right' },
-  { id: '85', round: 'R32', team1Slot: 'B1', team2Slot: 'T5', nextMatchId: '96', side: 'right' },
-  { id: '87', round: 'R32', team1Slot: 'K1', team2Slot: 'T7', nextMatchId: '96', side: 'right' },
+  { id: '88', round: 'R32', team1Slot: 'D2', team2Slot: 'G2', nextMatchId: '95', side: 'right' },
+  { id: '85', round: 'R32', team1Slot: 'B1', team2Slot: 'T7', nextMatchId: '96', side: 'right' },
+  { id: '87', round: 'R32', team1Slot: 'K1', team2Slot: 'T8', nextMatchId: '96', side: 'right' },
 
   // ROUND OF 16 - LEFT
   { id: '89', round: 'R16', team1Slot: 'W74', team2Slot: 'W77', nextMatchId: '97', side: 'left' },

@@ -112,6 +112,7 @@ const PredictorLayout: React.FC = () => {
             <button className={`tab-button ${activeTab === 'third-place' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/third-place')}>Third Place {!user && !isGuestMode && '🔒'}</button>
             <button className={`tab-button ${activeTab === 'knockouts' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/knockouts')}>Knockouts {!user && !isGuestMode && '🔒'}</button>
             <button className={`tab-button ${activeTab === 'recap' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/recap')}>Recap {!user && !isGuestMode && '🔒'}</button>
+            <button className={`tab-button ${activeTab === 'compare' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/compare')}>Live Compare {!user && !isGuestMode && '🔒'}</button>
             <button className={`tab-button ${activeTab === 'trends' ? 'active' : ''}`} onClick={() => handleRestrictedTabClick('/predict/trends')}>Trends {!user && !isGuestMode && '🔒'}</button>
             <button className={`tab-button ${activeTab === 'leaderboard' ? 'active' : ''}`} onClick={() => navigate('/predict/leaderboard')}>Leaderboard</button>
           </div>

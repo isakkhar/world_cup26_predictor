@@ -3885,4 +3885,37 @@
   }
 }
 
+/* --- Score Predictor Trigger Styles --- */
+.ko-score-predict-trigger {
+  margin-top: 0.75rem;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
+}
+
+.ko-score-predict-trigger:hover {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.predict-score-prompt {
+  color: #60a5fa;
+  font-weight: 500;
+}
+
+.predicted-score-label {
+  color: #cbd5e1;
+}
+
+.predicted-score-label strong {
+  color: #60a5fa;
+  font-size: 0.9rem;
+}
+
 
